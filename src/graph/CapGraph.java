@@ -11,21 +11,24 @@ import java.util.List;
  * For the warm up assignment, you must implement your Graph in a class
  * named CapGraph.  Here is the stub file.
  *
+ * Digraph
+ *
+ * Use helper class SCC to find the strongly connected components.
  */
 public class CapGraph implements Graph {
 
 	private HashMap<Integer, HashSet<Integer>> adj;
 
 
-	public CapGraph(HashMap<Integer, HashSet<Integer>> adj) {
+	public CapGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
 		this.adj = new HashMap<>(adj); // java default copy constructor, copy both keys and values
 	}
 
-	public CapGraph() {
+	public CapGraph() {	// construct an empty graph
 		this(new HashMap<>());
 	}
 
-	public CapGraph(Graph g) {
+	public CapGraph(Graph g) { // copy constructor
 		this(g.exportGraph());
 	}
 
@@ -78,7 +81,7 @@ public class CapGraph implements Graph {
 	}
 
 	@Override
-	public List<Graph> getSCCs() {
+	public List<Graph> getSCCs() { // get the strongly connected components
 
 		SCC scc = new SCC(this);
 		return scc.getSCCs();
@@ -89,7 +92,7 @@ public class CapGraph implements Graph {
 		return adj;
 	}
 
-	public Graph reverse() {
+	public Graph reverse() {	// get the reverse graph
 
 		Graph rev_g = new CapGraph();
 
@@ -106,7 +109,7 @@ public class CapGraph implements Graph {
 		return rev_g;
 	}
 
-	public Iterable<Integer> getAdjacent(int v) {
+	public Iterable<Integer> getAdjacent(int v) {	// get the adjacent vertices
 
 		if (!adj.containsKey(v)) {
 			throw new IllegalArgumentException("vertex " + v + " doesn't exist.");
@@ -123,7 +126,7 @@ public class CapGraph implements Graph {
 		return containsVertex(from) && containsVertex(to) && adj.get(from).contains(to);
 	}
 
-	public Graph createSubgraph(Iterable<Integer> vertices) {
+	public Graph createSubgraph(Iterable<Integer> vertices) { // create subgraph on selected vetices
 
 		HashSet<Integer> sub = new HashSet<>();
 

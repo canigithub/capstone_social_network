@@ -3,14 +3,19 @@ package graph;
 
 import java.util.*;
 
+/**
+ *   This class use a two-phase dfs to find the strongly connected component.
+ *   May add methods like lookup if two vertices are strongly connected later.
+ */
+
 public class SCC {
 
     private int group_num;
-    private CapGraph g;
-    private CapGraph rev_g;
+    private CapGraph g;         // original graph
+    private CapGraph rev_g;     // reverse graph
     private HashSet<Integer> visited;
-    private Stack<Integer> post_order;
-    private HashMap<Integer, Integer> group;
+    private Stack<Integer> post_order;  // post order traverse on original graph
+    private HashMap<Integer, Integer> group;    // a map of vertex number -> group number
 
     public SCC (CapGraph g) {
 
