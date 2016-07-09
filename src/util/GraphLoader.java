@@ -6,7 +6,7 @@
  */
 package util;
 
-import warmup.Graph;
+import graph.bpGraph;
 
 import java.io.File;
 import java.util.HashSet;
@@ -19,7 +19,7 @@ public class GraphLoader {
      * The file should consist of lines with 2 integers each, corresponding
      * to a "from" vertex and a "to" vertex.
      */ 
-    public static void loadGraph(Graph g, String filename) {
+    public static void loadGraph(warmup.Graph g, String filename) {
         Set<Integer> seen = new HashSet<Integer>();
         Scanner sc;
         try {
@@ -53,11 +53,8 @@ public class GraphLoader {
      * indicating the total number of nodes N and the total number of edges M.
      * Following the header line, there are N adjacency list lines, one for
      * each node, in order. the vertex is 1-named
-     *
-     * @param g: graph object
-     * @param f_name: file path
      */
-    public static void loadYahooGraph(graph.bpGraph g, String f_name) {
+    public static graph.bpGraph loadYahooGraph(String f_name) {
 
         Scanner sc;
         try {
@@ -65,21 +62,31 @@ public class GraphLoader {
         }
         catch (Exception e) {
             e.printStackTrace();
-            return;
+            return null;
         }
 
         // read header
         String[] header = sc.nextLine().split(" ");
-        int V = Integer.parseInt(header[0]), E = Integer.parseInt(header[1]);
+        int V = Integer.parseInt(header[0]);
+//        int E = Integer.parseInt(header[1]);
 
-        // now construct graph, E can be used for sanity check
+        // construct graph use V, E is for later sanity check
+        bpGraph g = new bpGraph(V);
 
         int v = 0;
+//        int e = 0;
         while (sc.hasNextLine()) {
             String[] toks = sc.nextLine().split(" ");
-            // now add edges
+            for (String s : toks) {
+                g.addEdge(v, Integer.parseInt(s)-1);
+//                e++;
+            }
+            v++;
         }
         sc.close();
+
+//        System.out.println(E + " " + e);
+        return g;
     }
 
 }
