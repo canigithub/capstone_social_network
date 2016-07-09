@@ -1,9 +1,8 @@
-package graph;
+package warmup;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public interface Graph {
     /* Creates a vertex with the given number. */

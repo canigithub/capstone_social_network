@@ -1,5 +1,5 @@
 
-package graph;
+package warmup;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,20 +15,20 @@ import java.util.List;
  *
  * Use helper class SCC to find the strongly connected components.
  */
-public class CapGraph implements Graph {
+public class WarmUpGraph implements Graph {
 
 	private HashMap<Integer, HashSet<Integer>> adj;
 
 
-	public CapGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
+	public WarmUpGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
 		this.adj = new HashMap<>(adj); // java default copy constructor, copy both keys and values
 	}
 
-	public CapGraph() {	// construct an empty graph
+	public WarmUpGraph() {	// construct an empty graph
 		this(new HashMap<>());
 	}
 
-	public CapGraph(Graph g) { // copy constructor
+	public WarmUpGraph(Graph g) { // copy constructor
 		this(g.exportGraph());
 	}
 
@@ -67,7 +67,7 @@ public class CapGraph implements Graph {
 		HashSet<Integer> adj_center = adj.get(center);
 
 		ego_adj.put(center, adj_center);
-		Graph egonet = new CapGraph(ego_adj);
+		Graph egonet = new WarmUpGraph(ego_adj);
 
 		for (Integer i : adj_center) {
 			for (Integer j : adj.get(i)) {
@@ -83,8 +83,8 @@ public class CapGraph implements Graph {
 	@Override
 	public List<Graph> getSCCs() { // get the strongly connected components
 
-		SCC scc = new SCC(this);
-		return scc.getSCCs();
+		WarmUpSCC warmUpScc = new WarmUpSCC(this);
+		return warmUpScc.getSCCs();
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class CapGraph implements Graph {
 
 	public Graph reverse() {	// get the reverse graph
 
-		Graph rev_g = new CapGraph();
+		Graph rev_g = new WarmUpGraph();
 
 		for (Integer i : adj.keySet()) {
 			rev_g.addVertex(i);
@@ -136,7 +136,7 @@ public class CapGraph implements Graph {
 			}
 		}
 
-		Graph sub_g = new CapGraph();
+		Graph sub_g = new WarmUpGraph();
 
 		for (Integer i : sub) {
 			sub_g.addVertex(i);
@@ -157,7 +157,7 @@ public class CapGraph implements Graph {
 
 	public static void main(String[] args) {
 
-		CapGraph g = new CapGraph();
+		WarmUpGraph g = new WarmUpGraph();
 		g.addVertex(0);
 		g.addVertex(1);
 		g.addEdge(0,1);
@@ -169,7 +169,7 @@ public class CapGraph implements Graph {
 		Graph gg = g.reverse();
 		System.out.println(gg.exportGraph());
 
-		CapGraph ggg = (CapGraph) gg;
+		WarmUpGraph ggg = (WarmUpGraph) gg;
 		System.out.println(ggg.reverse().exportGraph());
 
 

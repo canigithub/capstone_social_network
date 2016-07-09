@@ -1,5 +1,5 @@
 
-package graph;
+package warmup;
 
 import java.util.*;
 
@@ -8,19 +8,19 @@ import java.util.*;
  *   May add methods like lookup if two vertices are strongly connected later.
  */
 
-public class SCC {
+public class WarmUpSCC {
 
     private int group_num;
-    private CapGraph g;         // original graph
-    private CapGraph rev_g;     // reverse graph
+    private WarmUpGraph g;         // original graph
+    private WarmUpGraph rev_g;     // reverse graph
     private HashSet<Integer> visited;
     private Stack<Integer> post_order;  // post order traverse on original graph
     private HashMap<Integer, Integer> group;    // a map of vertex number -> group number
 
-    public SCC (CapGraph g) {
+    public WarmUpSCC(WarmUpGraph g) {
 
-        this.g   = new CapGraph(g);
-        rev_g = (CapGraph) this.g.reverse();
+        this.g   = new WarmUpGraph(g);
+        rev_g = (WarmUpGraph) this.g.reverse();
         visited  = new HashSet<>();
         post_order = new Stack<>();
         group    = new HashMap<>();
@@ -109,7 +109,7 @@ public class SCC {
 
     public static void main(String[] args) {
 
-        CapGraph g = new CapGraph();
+        WarmUpGraph g = new WarmUpGraph();
 //        g.addEdge(32,44);
 //        g.addEdge(32,50);
 //        g.addEdge(44,50);
@@ -145,8 +145,8 @@ public class SCC {
         g.addEdge(11,12);
         g.addEdge(12,9);
 
-        SCC scc = new SCC(g);
-        List<Graph> sub = scc.getSCCs();
+        WarmUpSCC warmUpScc = new WarmUpSCC(g);
+        List<Graph> sub = warmUpScc.getSCCs();
         for (Graph gg : sub) {
             System.out.println(gg.exportGraph());
         }
