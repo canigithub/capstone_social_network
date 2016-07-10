@@ -15,20 +15,20 @@ import java.util.List;
  *
  * Use helper class SCC to find the strongly connected components.
  */
-public class WarmUpGraph implements Graph {
+public class WarmUpWmuGraph implements wmuGraph {
 
 	private HashMap<Integer, HashSet<Integer>> adj;
 
 
-	public WarmUpGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
+	public WarmUpWmuGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
 		this.adj = new HashMap<>(adj); // java default copy constructor, copy both keys and values
 	}
 
-	public WarmUpGraph() {	// construct an empty graph
+	public WarmUpWmuGraph() {	// construct an empty graph
 		this(new HashMap<>());
 	}
 
-	public WarmUpGraph(Graph g) { // copy constructor
+	public WarmUpWmuGraph(wmuGraph g) { // copy constructor
 		this(g.exportGraph());
 	}
 
@@ -57,7 +57,7 @@ public class WarmUpGraph implements Graph {
 	}
 
 	@Override
-	public Graph getEgonet(int center) {
+	public wmuGraph getEgonet(int center) {
 
 		if (!adj.containsKey(center)) {
 			throw new IllegalArgumentException("center " + center + " doesn't exist.");
@@ -67,7 +67,7 @@ public class WarmUpGraph implements Graph {
 		HashSet<Integer> adj_center = adj.get(center);
 
 		ego_adj.put(center, adj_center);
-		Graph egonet = new WarmUpGraph(ego_adj);
+		wmuGraph egonet = new WarmUpWmuGraph(ego_adj);
 
 		for (Integer i : adj_center) {
 			for (Integer j : adj.get(i)) {
@@ -81,7 +81,7 @@ public class WarmUpGraph implements Graph {
 	}
 
 	@Override
-	public List<Graph> getSCCs() { // get the strongly connected components
+	public List<wmuGraph> getSCCs() { // get the strongly connected components
 
 		WarmUpSCC warmUpScc = new WarmUpSCC(this);
 		return warmUpScc.getSCCs();
@@ -92,9 +92,9 @@ public class WarmUpGraph implements Graph {
 		return adj;
 	}
 
-	public Graph reverse() {	// get the reverse graph
+	public wmuGraph reverse() {	// get the reverse graph
 
-		Graph rev_g = new WarmUpGraph();
+		wmuGraph rev_g = new WarmUpWmuGraph();
 
 		for (Integer i : adj.keySet()) {
 			rev_g.addVertex(i);
@@ -126,7 +126,7 @@ public class WarmUpGraph implements Graph {
 		return containsVertex(from) && containsVertex(to) && adj.get(from).contains(to);
 	}
 
-	public Graph createSubgraph(Iterable<Integer> vertices) { // create subgraph on selected vetices
+	public wmuGraph createSubgraph(Iterable<Integer> vertices) { // create subgraph on selected vetices
 
 		HashSet<Integer> sub = new HashSet<>();
 
@@ -136,7 +136,7 @@ public class WarmUpGraph implements Graph {
 			}
 		}
 
-		Graph sub_g = new WarmUpGraph();
+		wmuGraph sub_g = new WarmUpWmuGraph();
 
 		for (Integer i : sub) {
 			sub_g.addVertex(i);
@@ -157,7 +157,7 @@ public class WarmUpGraph implements Graph {
 
 	public static void main(String[] args) {
 
-		WarmUpGraph g = new WarmUpGraph();
+		WarmUpWmuGraph g = new WarmUpWmuGraph();
 		g.addVertex(0);
 		g.addVertex(1);
 		g.addEdge(0,1);
@@ -166,10 +166,10 @@ public class WarmUpGraph implements Graph {
 		g.addEdge(1,2);
 		System.out.println(g.exportGraph());
 
-		Graph gg = g.reverse();
+		wmuGraph gg = g.reverse();
 		System.out.println(gg.exportGraph());
 
-		WarmUpGraph ggg = (WarmUpGraph) gg;
+		WarmUpWmuGraph ggg = (WarmUpWmuGraph) gg;
 		System.out.println(ggg.reverse().exportGraph());
 
 

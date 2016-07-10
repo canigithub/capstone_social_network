@@ -1,18 +1,20 @@
 package draw;
 
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.*;
 
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
-import sun.java2d.loops.GeneralRenderer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class HelloWorld {
 
-    public static void main(String[] args) {
-
+    public static void jgraph_tutorial() {
         GraphModel model = new DefaultGraphModel();
         GraphLayoutCache view = new GraphLayoutCache(model, new DefaultCellViewFactory());
         JGraph graph = new JGraph(model, view);
@@ -47,5 +49,40 @@ public class HelloWorld {
         frame.getContentPane().add(new JScrollPane(graph));
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public static void graph_stream_tutorial() {
+
+    }
+
+
+    public static void main(String[] args) {
+
+        org.graphstream.graph.Graph g = new SingleGraph("tutorial_1");
+
+        g.addNode("a");
+        g.addNode("b");
+        g.addNode("c");
+        g.addEdge("ab", "a", "b");
+        g.addEdge("bc", "b", "c");
+        g.addEdge("ca", "c", "a");
+
+//        g.display();
+
+        for (Node n : g) {
+            System.out.println(n.getId());
+        }
+
+        for (org.graphstream.graph.Edge e : g.getEachEdge()) {
+            System.out.println(e.getId());
+        }
+
+        Collection<Node> nodes = g.getNodeSet();
+
+        Iterator<? extends Node> nnodes = g.getNodeIterator();
+
+
+//        jgraph_tutorial();
+
     }
 }

@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
-import warmup.WarmUpGraph;
-import warmup.Graph;
+import warmup.WarmUpWmuGraph;
+import warmup.wmuGraph;
 
 public class SCCGrader extends Grader {
     public int totalTests;
@@ -63,7 +63,7 @@ public class SCCGrader extends Grader {
         try {
 
             for(int i = 0; i < 10; i++) {
-                Graph g = new WarmUpGraph();
+                wmuGraph g = new WarmUpWmuGraph();
                 Set<Integer> vertices;
 
                 String answerFile = "data/scc_answers/scc_" + (i + 1) + ".txt";
@@ -90,12 +90,12 @@ public class SCCGrader extends Grader {
 
 
                 // get student SCC result
-                List<Graph> graphSCCs = g.getSCCs();
+                List<wmuGraph> wmuGraphSCCs = g.getSCCs();
 
                 List<Set<Integer>> sccs = new ArrayList<Set<Integer>>();
 
-                for(Graph graph : graphSCCs) {
-                    HashMap<Integer, HashSet<Integer>> curr = graph.exportGraph();
+                for(wmuGraph wmuGraph : wmuGraphSCCs) {
+                    HashMap<Integer, HashSet<Integer>> curr = wmuGraph.exportGraph();
                     TreeSet<Integer> scc = new TreeSet<Integer>();
                     for (Map.Entry<Integer, HashSet<Integer>> entry : curr.entrySet()) {
                         scc.add(entry.getKey());

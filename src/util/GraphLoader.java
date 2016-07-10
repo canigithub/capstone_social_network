@@ -6,7 +6,9 @@
  */
 package util;
 
-import graph.bpGraph;
+import graph.BipGraph;
+import sun.dc.pr.PRError;
+import warmup.wmuGraph;
 
 import java.io.File;
 import java.util.HashSet;
@@ -19,7 +21,7 @@ public class GraphLoader {
      * The file should consist of lines with 2 integers each, corresponding
      * to a "from" vertex and a "to" vertex.
      */ 
-    public static void loadGraph(warmup.Graph g, String filename) {
+    public static void loadGraph(wmuGraph g, String filename) {
         Set<Integer> seen = new HashSet<Integer>();
         Scanner sc;
         try {
@@ -53,8 +55,10 @@ public class GraphLoader {
      * indicating the total number of nodes N and the total number of edges M.
      * Following the header line, there are N adjacency list lines, one for
      * each node, in order. the vertex is 1-named
+     *
+     * notice: for this yahoo ads data, 459678 ads is in the front part.
      */
-    public static graph.bpGraph loadYahooGraph(String f_name) {
+    public static BipGraph loadYahooGraph(String f_name) {
 
         Scanner sc;
         try {
@@ -65,28 +69,29 @@ public class GraphLoader {
             return null;
         }
 
-        // read header
+        // read header, E can be used for sanity check later.
         String[] header = sc.nextLine().split(" ");
         int V = Integer.parseInt(header[0]);
-//        int E = Integer.parseInt(header[1]);
 
         // construct graph use V, E is for later sanity check
-        bpGraph g = new bpGraph(V);
+        BipGraph g = new BipGraph(V);
+        final int n = 459678;
 
         int v = 0;
-//        int e = 0;
-        while (sc.hasNextLine()) {
+        System.out.print("loading");
+        while (sc.hasNextLine() && v < n) {
             String[] toks = sc.nextLine().split(" ");
             for (String s : toks) {
-                g.addEdge(v, Integer.parseInt(s)-1);
-//                e++;
+                int w = Integer.parseInt(s)-1;
+//                if (!g.containEdge(v, w)) {
+                    g.addEdge(v, w);
+//                }
             }
             v++;
+            if (v % (n/10) == 0) System.out.print(".." + Math.round((float) 100*v/n) + "%");
         }
+        System.out.println();
         sc.close();
-
-//        System.out.println(E + " " + e);
         return g;
     }
-
 }

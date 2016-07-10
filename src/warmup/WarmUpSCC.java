@@ -11,16 +11,16 @@ import java.util.*;
 public class WarmUpSCC {
 
     private int group_num;
-    private WarmUpGraph g;         // original graph
-    private WarmUpGraph rev_g;     // reverse graph
+    private WarmUpWmuGraph g;         // original graph
+    private WarmUpWmuGraph rev_g;     // reverse graph
     private HashSet<Integer> visited;
     private Stack<Integer> post_order;  // post order traverse on original graph
     private HashMap<Integer, Integer> group;    // a map of vertex number -> group number
 
-    public WarmUpSCC(WarmUpGraph g) {
+    public WarmUpSCC(WarmUpWmuGraph g) {
 
-        this.g   = new WarmUpGraph(g);
-        rev_g = (WarmUpGraph) this.g.reverse();
+        this.g   = new WarmUpWmuGraph(g);
+        rev_g = (WarmUpWmuGraph) this.g.reverse();
         visited  = new HashSet<>();
         post_order = new Stack<>();
         group    = new HashMap<>();
@@ -87,7 +87,7 @@ public class WarmUpSCC {
         }
     }
 
-    public List<Graph> getSCCs() {
+    public List<wmuGraph> getSCCs() {
 
         List<Integer>[] scc_vertices = new List[group_num+1]; // group_num is the index of each group
         for (int i = 0; i < scc_vertices.length; ++i) {
@@ -99,7 +99,7 @@ public class WarmUpSCC {
         }
 
 
-        List<Graph> scc_subgraphs = new LinkedList<>();
+        List<wmuGraph> scc_subgraphs = new LinkedList<>();
         for (int i = 0; i < scc_vertices.length; ++i) {
             scc_subgraphs.add(g.createSubgraph(scc_vertices[i]));
         }
@@ -109,7 +109,7 @@ public class WarmUpSCC {
 
     public static void main(String[] args) {
 
-        WarmUpGraph g = new WarmUpGraph();
+        WarmUpWmuGraph g = new WarmUpWmuGraph();
 //        g.addEdge(32,44);
 //        g.addEdge(32,50);
 //        g.addEdge(44,50);
@@ -146,8 +146,8 @@ public class WarmUpSCC {
         g.addEdge(12,9);
 
         WarmUpSCC warmUpScc = new WarmUpSCC(g);
-        List<Graph> sub = warmUpScc.getSCCs();
-        for (Graph gg : sub) {
+        List<wmuGraph> sub = warmUpScc.getSCCs();
+        for (wmuGraph gg : sub) {
             System.out.println(gg.exportGraph());
         }
 
