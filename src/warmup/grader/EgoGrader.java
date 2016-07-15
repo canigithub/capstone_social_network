@@ -15,8 +15,8 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 import util.GraphLoader;
-import warmup.WarmUpWmuGraph;
-import warmup.wmuGraph;
+import warmup.wuGraph;
+import warmup.Graph;
 
 public class EgoGrader extends Grader {
     private static final int TESTS = 10;
@@ -50,13 +50,13 @@ public class EgoGrader extends Grader {
     /* Main grading method */
     public void run() {
         try {
-            wmuGraph wmuGraph = new WarmUpWmuGraph();
-            GraphLoader.loadGraph(wmuGraph, "data/facebook_ucsd.txt");
+            Graph Graph = new wuGraph();
+            GraphLoader.loadGraph(Graph, "data/facebook_ucsd.txt");
             feedback += "\nGRAPH: facebook_ucsd.txt";
             for (int i = 0; i < 10; i++) {
                 feedback += appendFeedback(i + 1, "Starting from node " + i);
                 // Run user's implementation and make the output readable
-                HashMap<Integer, HashSet<Integer>> res = wmuGraph.getEgonet(i).exportGraph();
+                HashMap<Integer, HashSet<Integer>> res = Graph.getEgonet(i).exportGraph();
                 BufferedReader br = new BufferedReader(new FileReader("data/ego_answers/ego_" + i + ".txt"));
                 String next;
                 boolean failed = false;

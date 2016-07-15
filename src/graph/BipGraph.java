@@ -26,17 +26,12 @@ public class BipGraph {
 
     public BipGraph(int V) {
 
-        this.V = V + 2;         // 2 more for source and sink
+        this.V = V;         // 2 more for source and sink
         this.E = 0;
 
         adj = new Set[this.V];
         for (int i = 0; i < this.V; ++i) {
             adj[i] = new HashSet<>();
-        }
-
-        for (int i = 0; i < this.V-2; ++i) {
-            addEdge(this.V-2, i);    // source to node i
-            addEdge(i, this.V-1);    // node i to sink
         }
     }
 
@@ -74,9 +69,6 @@ public class BipGraph {
 
         System.out.println("V = " + g.V);
         System.out.println("E = " + g.E);
-//        System.out.println("edge cnt 0-459677: " + g.countEdge(0, 459677));
-
-
     }
 
 }

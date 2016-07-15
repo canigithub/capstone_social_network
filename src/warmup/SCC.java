@@ -8,19 +8,19 @@ import java.util.*;
  *   May add methods like lookup if two vertices are strongly connected later.
  */
 
-public class WarmUpSCC {
+public class SCC {
 
     private int group_num;
-    private WarmUpWmuGraph g;         // original graph
-    private WarmUpWmuGraph rev_g;     // reverse graph
+    private wuGraph g;         // original graph
+    private wuGraph rev_g;     // reverse graph
     private HashSet<Integer> visited;
     private Stack<Integer> post_order;  // post order traverse on original graph
     private HashMap<Integer, Integer> group;    // a map of vertex number -> group number
 
-    public WarmUpSCC(WarmUpWmuGraph g) {
+    public SCC(wuGraph g) {
 
-        this.g   = new WarmUpWmuGraph(g);
-        rev_g = (WarmUpWmuGraph) this.g.reverse();
+        this.g   = new wuGraph(g);
+        rev_g = (wuGraph) this.g.reverse();
         visited  = new HashSet<>();
         post_order = new Stack<>();
         group    = new HashMap<>();
@@ -87,7 +87,7 @@ public class WarmUpSCC {
         }
     }
 
-    public List<wmuGraph> getSCCs() {
+    public List<Graph> getSCCs() {
 
         List<Integer>[] scc_vertices = new List[group_num+1]; // group_num is the index of each group
         for (int i = 0; i < scc_vertices.length; ++i) {
@@ -99,7 +99,7 @@ public class WarmUpSCC {
         }
 
 
-        List<wmuGraph> scc_subgraphs = new LinkedList<>();
+        List<Graph> scc_subgraphs = new LinkedList<>();
         for (int i = 0; i < scc_vertices.length; ++i) {
             scc_subgraphs.add(g.createSubgraph(scc_vertices[i]));
         }
@@ -109,7 +109,7 @@ public class WarmUpSCC {
 
     public static void main(String[] args) {
 
-        WarmUpWmuGraph g = new WarmUpWmuGraph();
+        wuGraph g = new wuGraph();
 //        g.addEdge(32,44);
 //        g.addEdge(32,50);
 //        g.addEdge(44,50);
@@ -145,9 +145,9 @@ public class WarmUpSCC {
         g.addEdge(11,12);
         g.addEdge(12,9);
 
-        WarmUpSCC warmUpScc = new WarmUpSCC(g);
-        List<wmuGraph> sub = warmUpScc.getSCCs();
-        for (wmuGraph gg : sub) {
+        SCC scc = new SCC(g);
+        List<Graph> sub = scc.getSCCs();
+        for (Graph gg : sub) {
             System.out.println(gg.exportGraph());
         }
 

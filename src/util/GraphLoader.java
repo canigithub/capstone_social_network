@@ -7,8 +7,7 @@
 package util;
 
 import graph.BipGraph;
-import sun.dc.pr.PRError;
-import warmup.wmuGraph;
+import warmup.Graph;
 
 import java.io.File;
 import java.util.HashSet;
@@ -21,7 +20,7 @@ public class GraphLoader {
      * The file should consist of lines with 2 integers each, corresponding
      * to a "from" vertex and a "to" vertex.
      */ 
-    public static void loadGraph(wmuGraph g, String filename) {
+    public static void loadGraph(Graph g, String filename) {
         Set<Integer> seen = new HashSet<Integer>();
         Scanner sc;
         try {
@@ -75,20 +74,17 @@ public class GraphLoader {
 
         // construct graph use V, E is for later sanity check
         BipGraph g = new BipGraph(V);
-        final int n = 459678;
+        final int ads = 459678;
 
         int v = 0;
         System.out.print("loading");
-        while (sc.hasNextLine() && v < n) {
+        while (sc.hasNextLine() && v < ads) {
             String[] toks = sc.nextLine().split(" ");
             for (String s : toks) {
-                int w = Integer.parseInt(s)-1;
-//                if (!g.containEdge(v, w)) {
-                    g.addEdge(v, w);
-//                }
+                g.addEdge(v, Integer.parseInt(s)-1);
             }
             v++;
-            if (v % (n/10) == 0) System.out.print(".." + Math.round((float) 100*v/n) + "%");
+            if (v % (ads/10) == 0) System.out.print(".." + Math.round((float) 100*v/ads) + "%");
         }
         System.out.println();
         sc.close();

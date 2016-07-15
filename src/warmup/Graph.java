@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public interface wmuGraph {
+public interface Graph {
     /* Creates a vertex with the given number. */
     public void addVertex(int num);
     
@@ -12,12 +12,12 @@ public interface wmuGraph {
     public void addEdge(int from, int to);
 
     /* Finds the egonet centered at a given node. */
-    public wmuGraph getEgonet(int center);
+    public Graph getEgonet(int center);
 
     /* Returns all SCCs in a directed graph. Recall that the warm up
      * assignment assumes all Graphs are directed, and we will only 
      * test on directed graphs. */
-    public List<wmuGraph> getSCCs();
+    public List<Graph> getSCCs();
     
     /* Return the graph's connections in a readable format. 
      * The keys in this HashMap are the vertices in the graph.
