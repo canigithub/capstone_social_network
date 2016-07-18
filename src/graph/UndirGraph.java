@@ -3,13 +3,13 @@ package graph;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UndirectedGraph {
+public class UndirGraph {
 
     private final int V;
     private int E;
     private Set<Integer>[] adj;
 
-    public UndirectedGraph(int V) { // construct a graph from empty
+    public UndirGraph(int V) { // construct a graph from empty
 
         if (V < 0) {
             throw new IllegalArgumentException("vertex # must be positive.");
@@ -24,7 +24,7 @@ public class UndirectedGraph {
         }
     }
 
-    public UndirectedGraph(UndirectedGraph g) {
+    public UndirGraph(UndirGraph g) {
 
         V = g.V();
         E = g.E();
@@ -40,37 +40,44 @@ public class UndirectedGraph {
 
     public Set<Integer> adj(int v) {
 
-        if (v < 0 || v > V-1) {
-            throw new IllegalArgumentException("vertex out of range");
-        }
-
+        validateVertex(v);
         return adj[v];
+    }
+
+    private void validateVertex(int v) {
+        if (v < 0 || v > V-1) {
+            throw new IllegalArgumentException("vertex " + v + " out of range");
+        }
+    }
+
+    private void validateEdge(int v, int w) {
+        boolean b1, b2;
+        b1 = adj[v].contains(w);
+        b2 = adj[w].contains(v);
+        if (b1 != b2) {
+            throw new IllegalArgumentException("edge " + v + "-" + w + " invalid");
+        }
     }
 
     public void addEdge(int v, int w) {
 
-        boolean b1, b2;
-        b1 = adj[v].add(w);
-        b2 = adj[w].add(v);
+        validateVertex(v);
+        validateVertex(w);
+        validateEdge(v, w);
 
-        if (b1 != b2) {
-            throw new IllegalArgumentException("edge is not undirected. @addEdge");
-        }
+        if (!adj[v].contains(w)) E++;
 
-        if (b1) E++;
+        adj[v].add(w);
+        adj[w].add(v);
     }
 
     public void removeEdge(int v, int w) {
 
-        boolean b1, b2;
-        b1 = adj[v].contains(w);
-        b2 = adj[w].contains(v);
+        validateVertex(v);
+        validateVertex(w);
+        validateEdge(v, w);
 
-        if (!b1 != b2) {
-            throw new IllegalArgumentException("edge is not undirected. @removeEdge");
-        }
-
-        if (!b1) {
+        if (!adj[v].contains(w)) {
             throw new IllegalArgumentException("edge doesn't exist. @removeEdge");
         }
 
