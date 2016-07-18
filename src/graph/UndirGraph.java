@@ -1,10 +1,13 @@
 package graph;
 
+import util.GraphLoader;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class UndirGraph {
 
+    private static final String NEWLINE = System.getProperty("line.separator");
     private final int V;
     private int E;
     private Set<Integer>[] adj;
@@ -86,5 +89,26 @@ public class UndirGraph {
 
         E--;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(V + "Vertex  " + E + "Edges" + NEWLINE);
+        for (int v = 0; v < V; v++) {
+            sb.append(String.format("%d: ", v));
+            for (int w : adj[v]) {
+                sb.append(String.format("%d ", w));
+            }
+            sb.append(NEWLINE);
+        }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+
+        UndirGraph g = GraphLoader.loadUndirGraph(args[0]);
+//        System.out.println(g);
+    }
+
 
 }

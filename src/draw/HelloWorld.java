@@ -67,7 +67,7 @@ public class HelloWorld {
         g.addEdge("bc", "b", "c");
         g.addEdge("ca", "c", "a");
 
-//        g.display();
+        g.display();
 
         for (Node n : g) {
             System.out.println(n.getId());

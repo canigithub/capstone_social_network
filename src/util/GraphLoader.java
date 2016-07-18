@@ -6,9 +6,12 @@
  */
 package util;
 
-import graph.BipGraph;
+import graph.UndirGraph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 import warmup.Graph;
 
+import java.awt.Color;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -48,46 +51,53 @@ public class GraphLoader {
         sc.close();
     }
 
-    /**
-     * Construct a graph from a file.
-     * The file is in Metis format. There is one header line: N M
-     * indicating the total number of nodes N and the total number of edges M.
-     * Following the header line, there are N adjacency list lines, one for
-     * each node, in order. the vertex is 1-named
-     *
-     * notice: for this yahoo ads data, 459678 ads is in the front part.
-     */
-    public static BipGraph loadYahooGraph(String f_name) {
-
+    public static UndirGraph loadUndirGraph(String filename) {
         Scanner sc;
         try {
-            sc = new Scanner(new File(f_name));
+            sc = new Scanner(new File(filename));
         }
         catch (Exception e) {
             e.printStackTrace();
             return null;
         }
 
-        // read header, E can be used for sanity check later.
         String[] header = sc.nextLine().split(" ");
-        int V = Integer.parseInt(header[0]);
-
-        // construct graph use V, E is for later sanity check
-        BipGraph g = new BipGraph(V);
-        final int ads = 459678;
-
-        int v = 0;
-        System.out.print("loading");
-        while (sc.hasNextLine() && v < ads) {
-            String[] toks = sc.nextLine().split(" ");
-            for (String s : toks) {
-                g.addEdge(v, Integer.parseInt(s)-1);
-            }
-            v++;
-            if (v % (ads/10) == 0) System.out.print(".." + Math.round((float) 100*v/ads) + "%");
+        if (header.length != 2) {
+            throw new IllegalArgumentException("incorrect input file format.");
         }
-        System.out.println();
+        int V = Integer.parseInt(header[0]);
+        UndirGraph g = new UndirGraph(V);
+
+        org.graphstream.graph.Graph gs = new SingleGraph("demo");
+        for (int i = 0; i < V; ++i) {
+            gs.addNode(Integer.toString(i));
+        }
+
+        while (sc.hasNextLine()) {
+            String[] toks = sc.nextLine().split(" ");
+            if (toks.length != 2) {
+                throw new IllegalArgumentException("Incorret input file format.");
+            }
+            int v = Integer.parseInt(toks[0]);
+            int w = Integer.parseInt(toks[1]);
+            g.addEdge(v, w);
+            gs.addEdge(toks[0]+toks[1], toks[0], toks[1]);
+        }
         sc.close();
+        System.out.println(gs.getId());
+        for (Node node : gs) {
+            node.addAttribute("ui.label", node.getId());
+        }
+        gs.addAttribute("ui.antialias", true);
+        gs.addAttribute("ui.stylesheet", "node {shape: box;fill-color: blue, green, red;" +
+                "text-mode:normal;text-background-mode: plain; fill-mode: dyn-plain;}");
+        gs.getNode("0").addAttribute("ui.color", Color.RED);
+        gs.getNode("33").addAttribute("ui.color", Color.RED);
+        System.out.println(gs.getNode("0").getClass());
+//        System.out.println(gs.getNode("33").getId());
+        gs.display();
+
         return g;
     }
+
 }
