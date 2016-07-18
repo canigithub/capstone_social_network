@@ -6,10 +6,9 @@
  */
 package util;
 
-import graph.UndirGraph;
+import graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import warmup.Graph;
 
 import java.awt.Color;
 import java.io.File;
@@ -23,7 +22,7 @@ public class GraphLoader {
      * The file should consist of lines with 2 integers each, corresponding
      * to a "from" vertex and a "to" vertex.
      */ 
-    public static void loadGraph(Graph g, String filename) {
+    public static void loadGraph(warmup.Graph g, String filename) {
         Set<Integer> seen = new HashSet<Integer>();
         Scanner sc;
         try {
@@ -51,7 +50,7 @@ public class GraphLoader {
         sc.close();
     }
 
-    public static UndirGraph loadUndirGraph(String filename) {
+    public static Graph loadUndirGraph(String filename) {
         Scanner sc;
         try {
             sc = new Scanner(new File(filename));
@@ -66,7 +65,7 @@ public class GraphLoader {
             throw new IllegalArgumentException("incorrect input file format.");
         }
         int V = Integer.parseInt(header[0]);
-        UndirGraph g = new UndirGraph(V);
+        Graph g = new Graph(V);
 
         org.graphstream.graph.Graph gs = new SingleGraph("demo");
         for (int i = 0; i < V; ++i) {
@@ -84,18 +83,16 @@ public class GraphLoader {
             gs.addEdge(toks[0]+toks[1], toks[0], toks[1]);
         }
         sc.close();
-        System.out.println(gs.getId());
-        for (Node node : gs) {
-            node.addAttribute("ui.label", node.getId());
-        }
-        gs.addAttribute("ui.antialias", true);
-        gs.addAttribute("ui.stylesheet", "node {shape: box;fill-color: blue, green, red;" +
-                "text-mode:normal;text-background-mode: plain; fill-mode: dyn-plain;}");
-        gs.getNode("0").addAttribute("ui.color", Color.RED);
-        gs.getNode("33").addAttribute("ui.color", Color.RED);
-        System.out.println(gs.getNode("0").getClass());
-//        System.out.println(gs.getNode("33").getId());
-        gs.display();
+
+//        for (Node node : gs) {
+//            node.addAttribute("ui.label", node.getId());
+//        }
+//        gs.addAttribute("ui.antialias", true);
+//        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: black; " +
+//                "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
+//        gs.getNode("0").addAttribute("ui.color", Color.RED);
+//        gs.getNode("33").addAttribute("ui.color", Color.RED);
+//        gs.display();
 
         return g;
     }

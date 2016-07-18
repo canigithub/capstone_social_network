@@ -5,14 +5,19 @@ import util.GraphLoader;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UndirGraph {
+
+/**
+ * undirected graph for graph clustering problem.
+ */
+public class Graph {
 
     private static final String NEWLINE = System.getProperty("line.separator");
     private final int V;
     private int E;
-    private Set<Integer>[] adj;
+    private Set<Edge>[] adj;
+    private int[] weight;    // weight of each node, meaning # of shortest path through node.
 
-    public UndirGraph(int V) { // construct a graph from empty
+    public Graph(int V) { // construct a graph from empty
 
         if (V < 0) {
             throw new IllegalArgumentException("vertex # must be positive.");
@@ -20,6 +25,7 @@ public class UndirGraph {
 
         this.V = V;
         this.E = 0;
+        this.weight = new int[this.V];
 
         adj = new Set[this.V];
         for (int i = 0; i < this.V; ++i) {
@@ -27,7 +33,7 @@ public class UndirGraph {
         }
     }
 
-    public UndirGraph(UndirGraph g) {
+    public Graph(Graph g) {
 
         V = g.V();
         E = g.E();
@@ -41,7 +47,7 @@ public class UndirGraph {
 
     public int E() { return E; }
 
-    public Set<Integer> adj(int v) {
+    public Set<Edge> adj(int v) {
 
         validateVertex(v);
         return adj[v];
@@ -55,8 +61,8 @@ public class UndirGraph {
 
     private void validateEdge(int v, int w) {
         boolean b1, b2;
-        b1 = adj[v].contains(w);
-        b2 = adj[w].contains(v);
+        b1 = adj[v].contains(new Edge(v, w));
+        b2 = adj[w].contains(new Edge(v, w));
         if (b1 != b2) {
             throw new IllegalArgumentException("edge " + v + "-" + w + " invalid");
         }
@@ -68,10 +74,10 @@ public class UndirGraph {
         validateVertex(w);
         validateEdge(v, w);
 
-        if (!adj[v].contains(w)) E++;
+        if (!adj[v].contains(new Edge(v, w))) E++;
 
-        adj[v].add(w);
-        adj[w].add(v);
+        adj[v].add(new Edge(v, w));
+        adj[w].add(new Edge(v, w));
     }
 
     public void removeEdge(int v, int w) {
@@ -80,24 +86,29 @@ public class UndirGraph {
         validateVertex(w);
         validateEdge(v, w);
 
-        if (!adj[v].contains(w)) {
+        if (!adj[v].contains(new Edge(v, w))) {
             throw new IllegalArgumentException("edge doesn't exist. @removeEdge");
         }
 
-        adj[v].remove(w);
-        adj[w].remove(v);
+        adj[v].remove(new Edge(v, w));
+        adj[w].remove(new Edge(v, w));
 
         E--;
+    }
+
+    public void setVertexWeight(int v, int weight) {
+        validateVertex(v);
+        this.weight[v] = weight;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(V + "Vertex  " + E + "Edges" + NEWLINE);
+        sb.append(V + " Vertex  " + E + " Edges" + NEWLINE);
         for (int v = 0; v < V; v++) {
             sb.append(String.format("%d: ", v));
-            for (int w : adj[v]) {
-                sb.append(String.format("%d ", w));
+            for (Edge e : adj[v]) {
+                sb.append(String.format("%d ", e.other(v)));
             }
             sb.append(NEWLINE);
         }
@@ -106,8 +117,9 @@ public class UndirGraph {
 
     public static void main(String[] args) {
 
-        UndirGraph g = GraphLoader.loadUndirGraph(args[0]);
-//        System.out.println(g);
+        Graph g = GraphLoader.loadUndirGraph(args[0]);
+        System.out.println(g);
+
     }
 
 
