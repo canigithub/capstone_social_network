@@ -8,6 +8,7 @@ import java.util.Set;
 
 /**
  * undirected graph for graph clustering problem.
+ * single edge.
  */
 public class Graph {
 
@@ -15,7 +16,7 @@ public class Graph {
     private final int V;
     private int E;
     private Set<Edge>[] adj;
-    private int[] weight;    // weight of each node, meaning # of shortest path through node.
+
 
     public Graph(int V) { // construct a graph from empty
 
@@ -25,7 +26,6 @@ public class Graph {
 
         this.V = V;
         this.E = 0;
-        this.weight = new int[this.V];
 
         adj = new Set[this.V];
         for (int i = 0; i < this.V; ++i) {
@@ -96,11 +96,6 @@ public class Graph {
         E--;
     }
 
-    public void setVertexWeight(int v, int weight) {
-        validateVertex(v);
-        this.weight[v] = weight;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -118,8 +113,8 @@ public class Graph {
     public static void main(String[] args) {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
-        System.out.println(g);
-
+        Graph gg = new Graph(g);
+        System.out.println(gg);
     }
 
 
