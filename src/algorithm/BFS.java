@@ -16,7 +16,7 @@ public class BFS {
     private final int source;
     private int[] weight;    // weight of each node, meaning # of shortest path through node.
     private int[] distTo;
-    private List<Integer> leafs;
+    private Set<Integer> leafs;
 
     public BFS(Graph g, int source) {
 
@@ -24,9 +24,10 @@ public class BFS {
         this.source = source;
         weight = new int[g.V()];
         distTo = new int[g.V()];
-        leafs = new LinkedList<>();
+        leafs = new HashSet<>();
 
         calcVertexWeight();
+        calcEdgeScore();
     }
 
     private void calcVertexWeight() {
@@ -73,7 +74,7 @@ public class BFS {
                 distTo[v] = 1;
                 for (Edge e : g.adj(v)) {
                     int w = e.other(v);
-                    if (!visited.contains(w)) { // as long as a vertex is trying to enqueue its child, it's not leaf
+                    if (!visited.contains(w)) { // a vertex is trying to enqueue child, not leaf
                         isleaf = false;         // visited set is the vertex 'before' v.
                         if (!inqueue.contains(w)) {
                             q.add(w);
@@ -113,6 +114,51 @@ public class BFS {
 
     private void calcEdgeScore() {
 
+        Set<Integer> visited = new HashSet<>(); // record nodes close to leafs
+        Set<Integer> inqueue = new HashSet<>(); // record nodes far from leafs
+        Queue<Integer> q = new LinkedList<>();
+        for (Integer i : leafs) {
+            q.add(i);
+            inqueue.add(i);
+        }
+
+        while (!q.isEmpty()) {
+
+            int v = q.remove();
+            inqueue.remove(v);
+            visited.add(v);
+
+            if (leafs.contains(v)) {  // if is leaf
+                for (Edge e : g.adj(v)) {
+                    int w = e.other(v);
+                    e.setScore((double)weight[w]/weight[v]);
+                    if (!inqueue.contains(w)) { // if not in search queue, add to it
+                        q.add(w);
+                        inqueue.add(w);
+                    }
+                }
+                continue;
+            }
+
+            double score = 1;
+            for (Edge e : g.adj(v)) {
+                int w = e.other(v);
+                if (visited.contains(w)) { // w below v
+                    score += e.getScore();
+                }
+            }
+
+            for (Edge e : g.adj(v)) {
+                int w = e.other(v);
+                if (!visited.contains(w)) {
+                    e.setScore(score * (double)weight[w]/weight[v]);
+                    if (!inqueue.contains(w)) {
+                        q.add(w);
+                        inqueue.add(w);
+                    }
+                }
+            }
+        }
     }
 
     public int weight(int v) {return weight[v];}
@@ -124,8 +170,18 @@ public class BFS {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
 
         BFS b = new BFS(g, 0);
+
         System.out.println(Arrays.toString(b.weight));
-        System.out.println(Arrays.toString(b.distTo));
+
+        for (int v = 0; v < g.V(); ++v) {
+            System.out.print("v=" + v + ": ");
+            for (Edge e : g.adj(v)) {
+                System.out.print(String.format("%.2f ", e.getScore()) + ", ");
+            }
+            System.out.println();
+        }
+
+
         System.out.println(b.leafs);
 
     }

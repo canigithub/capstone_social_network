@@ -76,8 +76,10 @@ public class Graph {
 
         if (!adj[v].contains(new Edge(v, w))) E++;
 
-        adj[v].add(new Edge(v, w));
-        adj[w].add(new Edge(v, w));
+        Edge e = new Edge(v, w);
+
+        adj[v].add(e);
+        adj[w].add(e);
     }
 
     public void removeEdge(int v, int w) {
@@ -90,8 +92,9 @@ public class Graph {
             throw new IllegalArgumentException("edge doesn't exist. @removeEdge");
         }
 
-        adj[v].remove(new Edge(v, w));
-        adj[w].remove(new Edge(v, w));
+        Edge e = new Edge(v, w);
+        adj[v].remove(e);
+        adj[w].remove(e);
 
         E--;
     }
