@@ -90,8 +90,6 @@ public class GraphLoader {
 //        gs.addAttribute("ui.antialias", true);
 //        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: black; " +
 //                "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
-////        gs.getNode("0").addAttribute("ui.color", Color.RED);
-////        gs.getNode("33").addAttribute("ui.color", Color.RED);
 //        gs.display();
 
         return g;

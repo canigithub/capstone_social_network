@@ -20,7 +20,8 @@ public class BFS {
 
     public BFS(Graph g, int source) {
 
-        this.g = new Graph(g);
+//        this.g = new Graph(g);
+        this.g = g;
         this.source = source;
         weight = new int[g.V()];
         distTo = new int[g.V()];
@@ -160,10 +161,6 @@ public class BFS {
             }
         }
     }
-
-    public int weight(int v) {return weight[v];}
-
-    public int distTo(int v) {return distTo[v];}
 
     public static void main(String[] args) {
 
