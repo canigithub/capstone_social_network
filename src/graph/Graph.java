@@ -38,20 +38,20 @@ public class Graph {
         }
     }
 
-    public Graph(List<Integer> list) {
+    public Graph(Set<Integer> vertex) {
 
-        if (list == null) {
+        if (vertex == null) {
             throw new NullPointerException("list is null");
         }
 
-        if (list.size() == 0) {
+        if (vertex.size() == 0) {
             throw new IllegalArgumentException("vertex list invalid");
         }
 
-        this.V = list.size();
+        this.V = vertex.size();
         this.E = 0;
         G = new HashMap<>();
-        for (Integer i : list) {
+        for (Integer i : vertex) {
             G.put(i, new HashSet<>());
         }
     }
@@ -104,9 +104,10 @@ public class Graph {
         validateEdge(v, w);
 
         Edge e = new Edge(v, w);
-        if (!G.get(v).contains(e)) E++;
+        if (G.get(v).contains(e)) return;
         G.get(v).add(e);
         G.get(w).add(e);
+        E++;
 
     }
 
@@ -126,15 +127,15 @@ public class Graph {
 
     }
 
-    public List<List<Integer>> connectedVertex() {
+    public List<Set<Integer>> connectedVertex() {
 
-        List<List<Integer>> ret = new LinkedList<>();
+        List<Set<Integer>> ret = new LinkedList<>();
         Set<Integer> visited = new HashSet<>();
         for (Integer i : G.keySet()) {
 
             if (visited.contains(i)) continue;
 
-            List<Integer> component = new LinkedList<>();
+            Set<Integer> component = new HashSet<>();
             Queue<Integer> q = new LinkedList<>();
             Set<Integer> queue = new HashSet<>();
             q.add(i);
@@ -158,34 +159,30 @@ public class Graph {
         return ret;
     }
 
+    public List<Graph> connectedComponent() {
 
-//    private Graph createSubgraph(Iterable<Integer> vertices) { // create subgraph on selected vetices
-//
-//        HashSet<Integer> sub = new HashSet<>();
-//
-//        for (Integer i : vertices) {
-//            if (!sub.add(i)) {
-//                throw new IllegalArgumentException("duplicated vertex " + i + " in createSubgraph.");
-//            }
-//        }
-//
-//        Graph sub_g = new wuGraph();
-//
-//        for (Integer i : sub) {
-//            sub_g.addVertex(i);
-//        }
-//
-//        for (Integer i : sub) {
-//            for (Integer j : adj.get(i)) {
-//                if (sub.contains(j)) {
-//                    sub_g.addEdge(i, j);
-//                }
-//            }
-//        }
-//
-//        return sub_g;
-//    }
+        List<Set<Integer>> connectedvertexs = connectedVertex();
+        List<Graph> cc = new LinkedList<>();
+        for (Set<Integer> set : connectedvertexs) {
+            cc.add(createSubgraph(set));
+        }
+        return cc;
+    }
 
+    private Graph createSubgraph(Set<Integer> vertex) {
+
+        Graph subg = new Graph(vertex);
+
+        for (Integer v : subg.G.keySet()) {
+            for (Edge e : this.G.get(v)) {
+                int w = e.other(v);
+                if (subg.G.containsKey(w)) {
+                    subg.addEdge(v,w);
+                }
+            }
+        }
+        return subg;
+    }
 
     @Override
     public String toString() {
@@ -206,13 +203,11 @@ public class Graph {
     public static void main(String[] args) {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
-        System.out.println(g);
-        List<List<Integer>> list = g.connectedVertex();
-        System.out.println(list);
-        g.removeEdge(6, 4);
-        System.out.println(g);
-        list = g.connectedVertex();
-        System.out.println(list);
+
+        g.removeEdge(3, 4);
+        List<Graph> cc = g.connectedComponent();
+
+        System.out.println(cc);
     }
 
 }
