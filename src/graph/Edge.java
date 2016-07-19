@@ -12,6 +12,7 @@ public class Edge {
     private final int v;
     private final int w;
     private double score;
+//    private double total_score;
 
     public Edge(int v, int w, double score) {
         this.v = v;
@@ -23,6 +24,8 @@ public class Edge {
         this(v, w, 0);
     }
 
+    public int either() {return v;}
+
     public int other(int x) {
         if (x == v) return w;
         if (x == w) return v;
@@ -32,6 +35,10 @@ public class Edge {
     public void setScore(double score) { this.score = score; }
 
     public double getScore() { return score; }
+
+//    public void setTotalScore(double score) {total_score = score;}
+
+//    public double getTotalScore() {return total_score;}
 
     @Override
     public boolean equals(Object o) {

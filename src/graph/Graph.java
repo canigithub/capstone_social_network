@@ -59,15 +59,27 @@ public class Graph {
     public Graph(Graph g) {
 
         V = g.V();
-        E = g.E();
-        G = g.export();
+        E = 0;
+
+//        G = new HashMap<>(g.G);   // this way the edge only copy reference isteead of object -> incorrect.
+
+        G = new HashMap<>();
+
+        for (Integer v : g.G.keySet()) {
+            G.put(v, new HashSet<>());
+        }
+
+        for (Integer v : g.G.keySet()) {
+            for (Edge e : g.G.get(v)) {
+                int w = e.other(v);
+                this.addEdge(v, w);
+            }
+        }
     }
 
     public int V() { return V; }
 
     public int E() { return E; }
-
-    public Map<Integer, Set<Edge>> export() { return new HashMap<>(G); }
 
     public Map<Integer, Set<Edge>> getGraph() { return G; }
 
@@ -88,15 +100,6 @@ public class Graph {
         }
     }
 
-    public void addVertex(int v) {
-
-        if (G.containsKey(v)) {
-            throw new IllegalArgumentException("vertex " + v + " exists");
-        }
-        G.put(v, new HashSet<>());
-        V++;
-    }
-
     public void addEdge(int v, int w) {
 
         validateVertex(v);
@@ -104,11 +107,10 @@ public class Graph {
         validateEdge(v, w);
 
         Edge e = new Edge(v, w);
-        if (G.get(v).contains(e)) return;
-        G.get(v).add(e);
+        if (G.get(v).contains(e)) return;   // if edge exists, do nothing.
+        G.get(v).add(e);                    // otherwise, add edge to both vertex
         G.get(w).add(e);
         E++;
-
     }
 
     public void removeEdge(int v, int w) {
@@ -124,10 +126,15 @@ public class Graph {
         G.get(v).remove(e);
         G.get(w).remove(e);
         E--;
-
     }
 
-    public List<Set<Integer>> connectedVertex() {
+    public void removeEdge(Edge e) {
+        int v = e.either();
+        int w = e.other(v);
+        removeEdge(v, w);
+    }
+
+    public List<Set<Integer>> getConnectedVertex() {
 
         List<Set<Integer>> ret = new LinkedList<>();
         Set<Integer> visited = new HashSet<>();
@@ -155,13 +162,11 @@ public class Graph {
             }
             ret.add(component);
         }
-
         return ret;
     }
 
-    public List<Graph> connectedComponent() {
-
-        List<Set<Integer>> connectedvertexs = connectedVertex();
+    public List<Graph> getConnectedComponent() {
+        List<Set<Integer>> connectedvertexs = getConnectedVertex();
         List<Graph> cc = new LinkedList<>();
         for (Set<Integer> set : connectedvertexs) {
             cc.add(createSubgraph(set));
@@ -170,9 +175,7 @@ public class Graph {
     }
 
     private Graph createSubgraph(Set<Integer> vertex) {
-
         Graph subg = new Graph(vertex);
-
         for (Integer v : subg.G.keySet()) {
             for (Edge e : this.G.get(v)) {
                 int w = e.other(v);
@@ -204,10 +207,10 @@ public class Graph {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
 
-        g.removeEdge(3, 4);
-        List<Graph> cc = g.connectedComponent();
-
+        g.removeEdge(33, 8);
+        List<Graph> cc = g.getConnectedComponent();
         System.out.println(cc);
+        System.out.println(g.E());
     }
 
 }
