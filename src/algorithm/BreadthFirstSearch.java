@@ -10,7 +10,7 @@ import java.util.*;
  * Breadth first search
  * given a source vertex, calculate all vertex weights and edge scores
  */
-public class BFS {
+public class BreadthFirstSearch {
 
     private Graph g;
     private final int source;
@@ -18,7 +18,7 @@ public class BFS {
     private int[] distTo;
     private Set<Integer> leafs;
 
-    public BFS(Graph g, int source) {
+    public BreadthFirstSearch(Graph g, int source) {
 
 //        this.g = new Graph(g);
         this.g = g;
@@ -166,7 +166,7 @@ public class BFS {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
 
-        BFS b = new BFS(g, 0);
+        BreadthFirstSearch b = new BreadthFirstSearch(g, 0);
 
         System.out.println(Arrays.toString(b.weight));
 

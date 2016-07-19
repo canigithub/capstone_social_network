@@ -9,6 +9,7 @@ import java.util.Set;
 /**
  * undirected graph for graph clustering problem.
  * single edge.
+ * need to check if the graph is connected. (use union-find)
  */
 public class Graph {
 
@@ -98,6 +99,7 @@ public class Graph {
 
         E--;
     }
+
 
     @Override
     public String toString() {

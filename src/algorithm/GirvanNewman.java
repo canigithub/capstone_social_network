@@ -1,7 +1,17 @@
 package algorithm;
 
+import graph.Graph;
+
 /**
- * Created by gerald on 7/16/16.
+ * Girvan-Newman algorighm
  */
 public class GirvanNewman {
+
+    private Graph g;
+
+    public GirvanNewman(Graph g) {
+
+        this.g = new Graph(g);
+    }
+
 }
