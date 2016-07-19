@@ -7,8 +7,8 @@ import util.GraphLoader;
 import java.util.*;
 
 /**
- * Breadth first search to count vertex weight and edge score
- * given a source vertex
+ * Breadth first search
+ * given a source vertex, calculate all vertex weights and edge scores
  */
 public class BFS {
 
@@ -16,7 +16,7 @@ public class BFS {
     private final int source;
     private int[] weight;    // weight of each node, meaning # of shortest path through node.
     private int[] distTo;
-
+    private List<Integer> leafs;
 
     public BFS(Graph g, int source) {
 
@@ -24,6 +24,12 @@ public class BFS {
         this.source = source;
         weight = new int[g.V()];
         distTo = new int[g.V()];
+        leafs = new LinkedList<>();
+
+        calcVertexWeight();
+    }
+
+    private void calcVertexWeight() {
 
         Set<Integer> visited = new HashSet<>();
         Set<Integer> inqueue = new HashSet<>();
@@ -33,21 +39,23 @@ public class BFS {
 
         while (!q.isEmpty()) {  // need to consider an inconnected graph
 
-//            System.out.println("v=" + q.peek() + " queue:" + q + " visited:" + visited + " inqueue:" + inqueue);
-
             int v = q.remove();
             inqueue.remove(v);
             visited.add(v);
+
+            boolean isleaf = true;
 
             // case 1: is source
             if (v == source) {
                 weight[v] = 1;
                 distTo[v] = 0;
                 for (Edge e : g.adj(v)) {
+                    isleaf = false;
                     int w = e.other(v);
                     q.add(w);
                     inqueue.add(w);
                 }
+                if (isleaf) leafs.add(v);
                 continue;
             }
 
@@ -65,11 +73,15 @@ public class BFS {
                 distTo[v] = 1;
                 for (Edge e : g.adj(v)) {
                     int w = e.other(v);
-                    if (!visited.contains(w) && !inqueue.contains(w)) {
-                        q.add(w);
-                        inqueue.add(w);
+                    if (!visited.contains(w)) { // as long as a vertex is trying to enqueue its child, it's not leaf
+                        isleaf = false;         // visited set is the vertex 'before' v.
+                        if (!inqueue.contains(w)) {
+                            q.add(w);
+                            inqueue.add(w);
+                        }
                     }
                 }
+                if (isleaf) leafs.add(v);
                 continue;
             }
 
@@ -78,9 +90,12 @@ public class BFS {
 
                 int w = e.other(v);
 
-                if (!visited.contains(w) && !inqueue.contains(w)) {
-                    q.add(w);
-                    inqueue.add(w);
+                if (!visited.contains(w)) {
+                    isleaf = false;
+                    if (!inqueue.contains(w)) {
+                        q.add(w);
+                        inqueue.add(w);
+                    }
                     continue;
                 }
 
@@ -92,10 +107,17 @@ public class BFS {
                     weight[v] += weight[w];
                 }
             }
-
-//            System.out.println("w=" + weight[v] + " d=" + distTo[v]);
+            if (isleaf) leafs.add(v);
         }
     }
+
+    private void calcEdgeScore() {
+
+    }
+
+    public int weight(int v) {return weight[v];}
+
+    public int distTo(int v) {return distTo[v];}
 
     public static void main(String[] args) {
 
@@ -104,6 +126,7 @@ public class BFS {
         BFS b = new BFS(g, 0);
         System.out.println(Arrays.toString(b.weight));
         System.out.println(Arrays.toString(b.distTo));
+        System.out.println(b.leafs);
 
     }
 }
