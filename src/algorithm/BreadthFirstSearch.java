@@ -34,15 +34,15 @@ public class BreadthFirstSearch {
     private void calcVertexWeight() {
 
         Set<Integer> visited = new HashSet<>();
-        Set<Integer> inqueue = new HashSet<>();
+        Set<Integer> queue = new HashSet<>();
         Queue<Integer> q = new LinkedList<>();
         q.add(source);
-        inqueue.add(source);
+        queue.add(source);
 
         while (!q.isEmpty()) {  // need to consider an inconnected graph
 
             int v = q.remove();
-            inqueue.remove(v);
+            queue.remove(v);
             visited.add(v);
 
             boolean isleaf = true;
@@ -55,7 +55,7 @@ public class BreadthFirstSearch {
                     isleaf = false;
                     int w = e.other(v);
                     q.add(w);
-                    inqueue.add(w);
+                    queue.add(w);
                 }
                 if (isleaf) leafs.add(v);
                 continue;
@@ -77,9 +77,9 @@ public class BreadthFirstSearch {
                     int w = e.other(v);
                     if (!visited.contains(w)) { // a vertex is trying to enqueue child, not leaf
                         isleaf = false;         // visited set is the vertex 'before' v.
-                        if (!inqueue.contains(w)) {
+                        if (!queue.contains(w)) {
                             q.add(w);
-                            inqueue.add(w);
+                            queue.add(w);
                         }
                     }
                 }
@@ -94,9 +94,9 @@ public class BreadthFirstSearch {
 
                 if (!visited.contains(w)) {
                     isleaf = false;
-                    if (!inqueue.contains(w)) {
+                    if (!queue.contains(w)) {
                         q.add(w);
-                        inqueue.add(w);
+                        queue.add(w);
                     }
                     continue;
                 }
@@ -116,26 +116,26 @@ public class BreadthFirstSearch {
     private void calcEdgeScore() {
 
         Set<Integer> visited = new HashSet<>(); // record nodes close to leafs
-        Set<Integer> inqueue = new HashSet<>(); // record nodes far from leafs
+        Set<Integer> queue = new HashSet<>(); // record nodes far from leafs
         Queue<Integer> q = new LinkedList<>();
         for (Integer i : leafs) {
             q.add(i);
-            inqueue.add(i);
+            queue.add(i);
         }
 
         while (!q.isEmpty()) {
 
             int v = q.remove();
-            inqueue.remove(v);
+            queue.remove(v);
             visited.add(v);
 
             if (leafs.contains(v)) {  // if is leaf
                 for (Edge e : g.getGraph().get(v)) {
                     int w = e.other(v);
                     e.setScore((double)weight[w]/weight[v]);
-                    if (!inqueue.contains(w)) { // if not in search queue, add to it
+                    if (!queue.contains(w)) { // if not in search queue, add to it
                         q.add(w);
-                        inqueue.add(w);
+                        queue.add(w);
                     }
                 }
                 continue;
@@ -153,9 +153,9 @@ public class BreadthFirstSearch {
                 int w = e.other(v);
                 if (!visited.contains(w)) {
                     e.setScore(score * (double)weight[w]/weight[v]);
-                    if (!inqueue.contains(w)) {
+                    if (!queue.contains(w)) {
                         q.add(w);
-                        inqueue.add(w);
+                        queue.add(w);
                     }
                 }
             }

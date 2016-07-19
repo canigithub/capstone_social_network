@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 import util.GraphLoader;
-import warmup.wuGraph;
+import warmup.CapGraph;
 import warmup.Graph;
 
 public class EgoGrader extends Grader {
@@ -50,7 +50,7 @@ public class EgoGrader extends Grader {
     /* Main grading method */
     public void run() {
         try {
-            Graph Graph = new wuGraph();
+            Graph Graph = new CapGraph();
             GraphLoader.loadGraph(Graph, "data/facebook_ucsd.txt");
             feedback += "\nGRAPH: facebook_ucsd.txt";
             for (int i = 0; i < 10; i++) {

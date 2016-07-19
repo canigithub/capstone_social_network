@@ -11,16 +11,16 @@ import java.util.*;
 public class SCC {
 
     private int group_num;
-    private wuGraph g;         // original graph
-    private wuGraph rev_g;     // reverse graph
+    private CapGraph g;         // original graph
+    private CapGraph rev_g;     // reverse graph
     private HashSet<Integer> visited;
     private Stack<Integer> post_order;  // post order traverse on original graph
     private HashMap<Integer, Integer> group;    // a map of vertex number -> group number
 
-    public SCC(wuGraph g) {
+    public SCC(CapGraph g) {
 
-        this.g   = new wuGraph(g);
-        rev_g = (wuGraph) this.g.reverse();
+        this.g   = new CapGraph(g);
+        rev_g = (CapGraph) this.g.reverse();
         visited  = new HashSet<>();
         post_order = new Stack<>();
         group    = new HashMap<>();
@@ -109,7 +109,7 @@ public class SCC {
 
     public static void main(String[] args) {
 
-        wuGraph g = new wuGraph();
+        CapGraph g = new CapGraph();
 //        g.addEdge(32,44);
 //        g.addEdge(32,50);
 //        g.addEdge(44,50);

@@ -15,20 +15,20 @@ import java.util.List;
  *
  * Use helper class SCC to find the strongly connected components.
  */
-public class wuGraph implements Graph {
+public class CapGraph implements Graph {
 
 	private HashMap<Integer, HashSet<Integer>> adj;
 
 
-	public wuGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
+	public CapGraph(HashMap<Integer, HashSet<Integer>> adj) {	// construct from a hashmap
 		this.adj = new HashMap<>(adj); // java default copy constructor, copy both keys and values
 	}
 
-	public wuGraph() {	// construct an empty graph
+	public CapGraph() {	// construct an empty graph
 		this(new HashMap<>());
 	}
 
-	public wuGraph(Graph g) { // copy constructor
+	public CapGraph(Graph g) { // copy constructor
 		this(g.exportGraph());
 	}
 
@@ -67,7 +67,7 @@ public class wuGraph implements Graph {
 		HashSet<Integer> adj_center = adj.get(center);
 
 		ego_adj.put(center, adj_center);
-		Graph egonet = new wuGraph(ego_adj);
+		Graph egonet = new CapGraph(ego_adj);
 
 		for (Integer i : adj_center) {
 			for (Integer j : adj.get(i)) {
@@ -94,7 +94,7 @@ public class wuGraph implements Graph {
 
 	public Graph reverse() {	// get the reverse graph
 
-		Graph rev_g = new wuGraph();
+		Graph rev_g = new CapGraph();
 
 		for (Integer i : adj.keySet()) {
 			rev_g.addVertex(i);
@@ -136,7 +136,7 @@ public class wuGraph implements Graph {
 			}
 		}
 
-		Graph sub_g = new wuGraph();
+		Graph sub_g = new CapGraph();
 
 		for (Integer i : sub) {
 			sub_g.addVertex(i);
@@ -157,7 +157,7 @@ public class wuGraph implements Graph {
 
 	public static void main(String[] args) {
 
-		wuGraph g = new wuGraph();
+		CapGraph g = new CapGraph();
 		g.addVertex(0);
 		g.addVertex(1);
 		g.addEdge(0,1);
@@ -169,7 +169,7 @@ public class wuGraph implements Graph {
 		Graph gg = g.reverse();
 		System.out.println(gg.exportGraph());
 
-		wuGraph ggg = (wuGraph) gg;
+		CapGraph ggg = (CapGraph) gg;
 		System.out.println(ggg.reverse().exportGraph());
 
 

@@ -2,10 +2,7 @@ package graph;
 
 import util.GraphLoader;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -19,6 +16,12 @@ public class Graph {
     private int V;
     private int E;
     private Map<Integer, Set<Edge>> G;
+
+    public Graph() {
+        this.V = 0;
+        this.E = 0;
+        G = new HashMap<>();
+    }
 
     public Graph(int V) { // construct a graph from empty
 
@@ -35,6 +38,24 @@ public class Graph {
         }
     }
 
+    public Graph(List<Integer> list) {
+
+        if (list == null) {
+            throw new NullPointerException("list is null");
+        }
+
+        if (list.size() == 0) {
+            throw new IllegalArgumentException("vertex list invalid");
+        }
+
+        this.V = list.size();
+        this.E = 0;
+        G = new HashMap<>();
+        for (Integer i : list) {
+            G.put(i, new HashSet<>());
+        }
+    }
+
     public Graph(Graph g) {
 
         V = g.V();
@@ -46,13 +67,9 @@ public class Graph {
 
     public int E() { return E; }
 
-    public Map<Integer, Set<Edge>> export() {
-        return new HashMap<>(G);
-    }
+    public Map<Integer, Set<Edge>> export() { return new HashMap<>(G); }
 
-    public Map<Integer, Set<Edge>> getGraph() {
-        return G;
-    }
+    public Map<Integer, Set<Edge>> getGraph() { return G; }
 
     private void validateVertex(int v) {
         if (!G.containsKey(v)) {
@@ -77,6 +94,7 @@ public class Graph {
             throw new IllegalArgumentException("vertex " + v + " exists");
         }
         G.put(v, new HashSet<>());
+        V++;
     }
 
     public void addEdge(int v, int w) {
@@ -108,13 +126,38 @@ public class Graph {
 
     }
 
-    public Iterable<Graph> connectedComponent() {
-        return null;
+    public List<List<Integer>> connectedVertex() {
+
+        List<List<Integer>> ret = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        for (Integer i : G.keySet()) {
+
+            if (visited.contains(i)) continue;
+
+            List<Integer> component = new LinkedList<>();
+            Queue<Integer> q = new LinkedList<>();
+            Set<Integer> queue = new HashSet<>();
+            q.add(i);
+            queue.add(i);
+            while (!q.isEmpty()) {
+                int v = q.remove();
+                queue.remove(v);
+                visited.add(v);
+                component.add(v);
+                for (Edge e : G.get(v)) {
+                    int w = e.other(v);
+                    if (!visited.contains(w) && !queue.contains(w)) {
+                        q.add(w);
+                        queue.add(w);
+                    }
+                }
+            }
+            ret.add(component);
+        }
+
+        return ret;
     }
 
-    private void bfs() {
-
-    }
 
 //    private Graph createSubgraph(Iterable<Integer> vertices) { // create subgraph on selected vetices
 //
@@ -163,9 +206,13 @@ public class Graph {
     public static void main(String[] args) {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
-        Graph gg = new Graph(g);
-        System.out.println(gg);
+        System.out.println(g);
+        List<List<Integer>> list = g.connectedVertex();
+        System.out.println(list);
+        g.removeEdge(6, 4);
+        System.out.println(g);
+        list = g.connectedVertex();
+        System.out.println(list);
     }
-
 
 }
