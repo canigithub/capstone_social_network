@@ -51,7 +51,7 @@ public class BreadthFirstSearch {
             if (v == source) {
                 weight[v] = 1;
                 distTo[v] = 0;
-                for (Edge e : g.adj(v)) {
+                for (Edge e : g.getGraph().get(v)) {
                     isleaf = false;
                     int w = e.other(v);
                     q.add(w);
@@ -63,7 +63,7 @@ public class BreadthFirstSearch {
 
             // case 2: is nextTo source
             boolean nextToSource = false;
-            for (Edge e : g.adj(v)) {
+            for (Edge e : g.getGraph().get(v)) {
                 if (e.other(v) == source) {
                     nextToSource = true;
                     break;
@@ -73,7 +73,7 @@ public class BreadthFirstSearch {
             if (nextToSource) {
                 weight[v] = 1;
                 distTo[v] = 1;
-                for (Edge e : g.adj(v)) {
+                for (Edge e : g.getGraph().get(v)) {
                     int w = e.other(v);
                     if (!visited.contains(w)) { // a vertex is trying to enqueue child, not leaf
                         isleaf = false;         // visited set is the vertex 'before' v.
@@ -88,7 +88,7 @@ public class BreadthFirstSearch {
             }
 
             // case 3: next to vertex j (not source)
-            for (Edge e : g.adj(v)) {
+            for (Edge e : g.getGraph().get(v)) {
 
                 int w = e.other(v);
 
@@ -130,7 +130,7 @@ public class BreadthFirstSearch {
             visited.add(v);
 
             if (leafs.contains(v)) {  // if is leaf
-                for (Edge e : g.adj(v)) {
+                for (Edge e : g.getGraph().get(v)) {
                     int w = e.other(v);
                     e.setScore((double)weight[w]/weight[v]);
                     if (!inqueue.contains(w)) { // if not in search queue, add to it
@@ -142,14 +142,14 @@ public class BreadthFirstSearch {
             }
 
             double score = 1;
-            for (Edge e : g.adj(v)) {
+            for (Edge e : g.getGraph().get(v)) {
                 int w = e.other(v);
                 if (visited.contains(w)) { // w below v
                     score += e.getScore();
                 }
             }
 
-            for (Edge e : g.adj(v)) {
+            for (Edge e : g.getGraph().get(v)) {
                 int w = e.other(v);
                 if (!visited.contains(w)) {
                     e.setScore(score * (double)weight[w]/weight[v]);
@@ -172,7 +172,7 @@ public class BreadthFirstSearch {
 
         for (int v = 0; v < g.V(); ++v) {
             System.out.print("v=" + v + ": ");
-            for (Edge e : g.adj(v)) {
+            for (Edge e : g.getGraph().get(v)) {
                 System.out.print(String.format("%.2f ", e.getScore()) + ", ");
             }
             System.out.println();
