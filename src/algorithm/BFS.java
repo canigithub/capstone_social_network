@@ -167,9 +167,7 @@ public class BFS {
     public static void main(String[] args) {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
-
         BFS b = new BFS(g, 4);
-
         System.out.println(Arrays.toString(b.weight));
 
         for (int v = 0; v < g.V(); ++v) {
@@ -179,9 +177,6 @@ public class BFS {
             }
             System.out.println();
         }
-
-
         System.out.println(b.leafs);
-
     }
 }

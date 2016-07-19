@@ -19,17 +19,18 @@ public class GirvanNewman {
 
         this.g0 = new Graph(g);
         this.g = new Graph(g);
-        this.cc = this.g.getConnectedComponent();
-
+//        this.cc = this.g.getConnectedComponent();
+        split();
     }
 
     private void split() {
 
         cc = g.getConnectedComponent();
-
+//        System.out.println(g.E());
         while (cc.size() == 1) {
             Edge cut_edge = findCutEdge();
             g.removeEdge(cut_edge);
+            System.out.println(g.E());
             cc = g.getConnectedComponent();
         }
     }
@@ -57,13 +58,7 @@ public class GirvanNewman {
 
         }
 
-//        for (Integer v : g.getGraph().keySet()) {
-//            System.out.print("v=" + v + ": ");
-//            for (Edge e : g.getGraph().get(v)) {
-//                System.out.print(e.other(v) + "(" + String.format("%.2f", e.getScore())+ ") ");
-//            }
-//            System.out.println();
-//        }
+
 
         double max = -1;
         Edge ret = null;
@@ -75,6 +70,7 @@ public class GirvanNewman {
             }
         }
 
+        System.out.println(ret + " " + String.format("%.2f", edge_score.get(ret)));
         return ret;
     }
 
@@ -128,6 +124,8 @@ public class GirvanNewman {
         }
         return count;
     }
+
+    public List<Graph> getConnectComponent() {return cc;}
 
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
