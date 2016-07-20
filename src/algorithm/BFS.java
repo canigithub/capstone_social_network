@@ -5,7 +5,6 @@ import graph.Graph;
 import util.GraphLoader;
 
 import java.util.*;
-import java.util.List;
 
 /**
  * Breadth first search
@@ -150,25 +149,11 @@ public class BFS {      // this need to be rewrited. all use hashmap
         }
     }
 
-    public void printEdgeScore() {
-
-        Map<Edge, Double> edgescore = new HashMap<>();
-
-        for (Integer i : g.getGraph().keySet()) {
-            for (Edge e : g.getGraph().get(i)) {
-                edgescore.put(e, e.getFlow());
-            }
-        }
-
-        for (Edge e : edgescore.keySet()) {
-            System.out.print(e.toString() + "(" + String.format("%.2f", edgescore.get(e)) + ")");
-        }
-    }
+    public Map<Edge, Double> getEdgeSet() {return new HashMap<>(edgeset);}
 
     public static void main(String[] args) {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
-//        System.out.println(g);
 
         for (int s = 0; s < 34; ++s ) {
             BFS b = new BFS(g, s);
@@ -182,29 +167,5 @@ public class BFS {      // this need to be rewrited. all use hashmap
             }
             System.out.println(flow);
         }
-
-
-
-
-//        List<Graph> list = new LinkedList<>();
-//        list.add(g);
-//        Draw d = new Draw(list);
-//
-//        d.gs.getNode(Integer.toString(s)).addAttribute("ui.color", Color.BLUE);
-//
-//        for (Node i : b.leaves) {
-//            d.gs.getNode(Integer.toString(i.vertex)).addAttribute("ui.color", Color.RED);
-//        }
-//        d.gs.display();
-
-//        System.out.println(Arrays.toString(b.weight));
-//        for (int v = 0; v < g.V(); ++v) {
-//            System.out.print("v=" + v + ": ");
-//            for (Edge e : g.getGraph().get(v)) {
-//                System.out.print(String.format("%.2f", e.getScore()) + ", ");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println(b.leafs);
     }
 }

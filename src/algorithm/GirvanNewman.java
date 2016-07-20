@@ -26,55 +26,38 @@ public class GirvanNewman {
     private void split() {
 
         cc = g.getConnectedComponent();
-//        System.out.println(g.E());
         while (cc.size() == 1) {
             Edge cut_edge = findCutEdge();
             g.removeEdge(cut_edge);
-            System.out.println(g.E());
             cc = g.getConnectedComponent();
         }
     }
 
     private Edge findCutEdge() {
 
-        Map<Edge, Double> edge_score = new HashMap<>();
+        Map<Edge, Double> edgeflow = new HashMap<>();
 
-        int k = 0;
         for (Integer i : g.getGraph().keySet()) {
             BFS bfs = new BFS(g, i);
 
-            HashSet<Edge> added = new HashSet<>();
-            for (Integer v : g.getGraph().keySet()) {
-                for (Edge e : g.getGraph().get(v)) {
-                    if (!added.contains(e)) {
-                        added.add(e);
-                        if (!edge_score.containsKey(e))
-                            edge_score.put(e, e.getFlow());
-                        else
-                            edge_score.put(e, edge_score.get(e) + e.getFlow());
-                    }
-                }
+            Map<Edge, Double> edgeset = bfs.getEdgeSet();
+            for (Edge e : edgeset.keySet()) {
+                if (!edgeflow.containsKey(e)) edgeflow.put(e, edgeset.get(e));
+                else edgeflow.put(e, edgeflow.get(e) + edgeset.get(e));
             }
         }
 
-        System.out.println("pass " + (k++) + ":");
-        Edge e1 = new Edge(0, 31);
-        System.out.print(e1 + "(" + edge_score.get(e1) + ") ");
-        e1 = new Edge(0, 8);
-        System.out.print(e1 + "(" + edge_score.get(e1) + ") ");
-        System.out.println();
+        double maxflow = -1;
+        Edge maxedge = null;
 
-        double max = -1;
-        Edge ret = null;
-
-        for (Edge e : edge_score.keySet()) {
-            if (edge_score.get(e) > max) {
-                ret = e;
-                max = edge_score.get(e);
+        for (Edge e : edgeflow.keySet()) {
+            if (edgeflow.get(e) > maxflow) {
+                maxflow = edgeflow.get(e);
+                maxedge = e;
             }
         }
-        System.out.println(ret + " " + String.format("%.2f", edge_score.get(ret)));
-        return ret;
+//        System.out.println(maxedge + " " + String.format("%.2f", maxflow));
+        return maxedge;
     }
 
     public double modularity() {
@@ -135,22 +118,9 @@ public class GirvanNewman {
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
         GirvanNewman gn = new GirvanNewman(g);
-//        System.out.println("before:");
-//        for (Graph gr : gn.cc) {
-//            System.out.println(gr.getGraph().keySet());
-//        }
         gn.split();
-//        System.out.println("after:");
-//        for (Graph gr : gn.cc) {
-//            System.out.println(gr.getGraph().keySet());
-//        }
+        System.out.println(gn.cc.get(0).getGraph().keySet());
+        System.out.println(gn.cc.get(1).getGraph().keySet());
 
-//        Graph g = new Graph(2);
-//        g.addEdge(0,1);
-//        Graph g0 = new Graph(g);
-//        Graph g1 = new Graph(g);
-//        for (Edge e : g0.getGraph().get(0)) {e.setScore(5.0);}
-//        for (Edge e : g0.getGraph().get(0)) {System.out.println(e.getScore());}
-//        for (Edge e : g1.getGraph().get(0)) {System.out.println(e.getScore());}
     }
 }

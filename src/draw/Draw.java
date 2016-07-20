@@ -54,10 +54,10 @@ public class Draw {
             for (Integer i : g.getGraph().keySet()) {
                 switch (k) {
                     case 0:
-                        gs.getNode(Integer.toString(i)).addAttribute("ui.color", Color.BLACK);
+                        gs.getNode(Integer.toString(i)).addAttribute("ui.color", Color.RED);
                         break;
                     case 1:
-                        gs.getNode(Integer.toString(i)).addAttribute("ui.color", Color.RED);
+                        gs.getNode(Integer.toString(i)).addAttribute("ui.color", Color.BLACK);
                     default:
                 }
             }
