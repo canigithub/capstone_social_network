@@ -15,7 +15,7 @@ public class Graph {
     private static final String NEWLINE = System.getProperty("line.separator");
     private int V;
     private int E;
-    private Map<Integer, Set<Edge>> G;
+    private Map<Integer, Set<Edge>> G;      // the adj list of the graph
 
     public Graph() {
         this.V = 0;
@@ -132,6 +132,16 @@ public class Graph {
         int v = e.either();
         int w = e.other(v);
         removeEdge(v, w);
+    }
+
+    public boolean isAdjacent(int v, int w) {
+        validateVertex(v);
+        validateVertex(w);
+        for (Edge e : G.get(v)) {
+            int i = e.other(v);
+            if (i == w) return true;
+        }
+        return false;
     }
 
     public List<Set<Integer>> getConnectedVertex() {

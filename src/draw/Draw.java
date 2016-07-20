@@ -19,15 +19,13 @@ public class Draw {
 
     public org.graphstream.graph.Graph gs;
 
-    public Draw(List<Graph> graphs) {
+    public Draw(Graph g0, List<Graph> graphs) {
 
         gs = new SingleGraph("karate club");
-        for (Graph g : graphs) {
-            for (Integer i : g.getGraph().keySet()) {
 
-                String id = Integer.toString(i);
-                gs.addNode(id);
-            }
+        for (Integer i : g0.getGraph().keySet()) {
+            String id = Integer.toString(i);
+            gs.addNode(id);
         }
 
         for (Node node : gs) {
@@ -36,15 +34,13 @@ public class Draw {
 
         Set<Edge> drawed = new HashSet<>();
 
-        for (Graph g : graphs) {
 
-            for (Integer v : g.getGraph().keySet()) {
-                for (Edge e : g.getGraph().get(v)) {
-                    int w = e.other(v);
-                    if (!drawed.contains(e)) {
-                        drawed.add(e);
-                        gs.addEdge(e.toString(), Integer.toString(v), Integer.toString(w));
-                    }
+        for (Integer v : g0.getGraph().keySet()) {
+            for (Edge e : g0.getGraph().get(v)) {
+                int w = e.other(v);
+                if (!drawed.contains(e)) {
+                    drawed.add(e);
+                    gs.addEdge(e.toString(), Integer.toString(v), Integer.toString(w));
                 }
             }
         }
@@ -75,6 +71,6 @@ public class Draw {
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
         GirvanNewman gn = new GirvanNewman(g);
-        Draw d = new Draw(gn.getConnectComponent());
+        Draw d = new Draw(gn.getGraph(), gn.getConnectComponent());
     }
 }

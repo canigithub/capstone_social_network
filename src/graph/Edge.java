@@ -4,16 +4,16 @@ package graph;
  * Undirected edge for social network clustering.
  *
  */
-public class Edge {
+public class Edge {     // betweenness of an edge: total amount of flow it carries
 
     private final int v;
     private final int w;
-    private double score;
+    private double flow;
 
     public Edge(int v, int w, double score) {
         this.v = v;
         this.w = w;
-        this.score = score;
+        this.flow = score;
     }
 
     public Edge(int v, int w) {
@@ -28,11 +28,9 @@ public class Edge {
         throw new IllegalArgumentException("vertex " + x + " not in this edge");
     }
 
-    public void addScore(double score) { this.score += score; }
+    public void setFlow(double score) {this.flow = score;}
 
-    public void setScore(double score) {this.score = score;}
-
-    public double getScore() { return score; }
+    public double getFlow() { return flow; }
 
     @Override
     public boolean equals(Object o) {

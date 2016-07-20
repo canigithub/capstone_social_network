@@ -1,11 +1,9 @@
 package algorithm;
 
-import draw.Draw;
 import graph.Edge;
 import graph.Graph;
 import util.GraphLoader;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -13,236 +11,142 @@ import java.util.List;
  * Breadth first search
  * given a source vertex, calculate all vertex weights and edge scores
  */
-public class BFS {
+public class BFS {      // this need to be rewrited. all use hashmap
 
     private Graph g;
     private int source;
-    private int[] weight;    // weight of each node, meaning # of shortest path through node.
-    private int[] distTo;
-    private Set<Integer> leaves;
-//    private PriorityQueue<Node> leaves;
+    private Map<Integer, Integer> weight;   // weight of each node
+    private Map<Integer, Integer> distTo;   // dist from source to each node
+    private Queue<Node> leaves;
+    private Map<Edge, Double> edgeset;
 
     private class Node implements Comparable<Node> {
-
         public int vertex;
         public int dist;
-
-        public Node(int v, int d) {
-            vertex = v;
-            dist = d;
-        }
-
-        public int compareTo(Node other) {
-            return other.dist - dist;       // default is min-pq but we need max-pq.
-        }
+        public Node(int v, int d) { vertex = v; dist = d; }
+        public int compareTo(Node that) {return that.dist-dist;}    // maxpq (default is minpq)
+        @Override
+        public String toString() {return Integer.toString(vertex);}
     }
 
     public BFS(Graph g, int source) {
 
+        if (g == null) {
+            throw new NullPointerException("graph is null.");
+        }
+
+        if (!g.getGraph().containsKey(source)) {
+            throw new IllegalArgumentException("source is not in graph.");
+        }
+
         this.g = g;
         this.source = source;
-        weight = new int[g.V()];
-        distTo = new int[g.V()];
-        leaves = new HashSet<>();
-//        leaves = new PriorityQueue<>();
+        weight = new HashMap<>();
+        distTo = new HashMap<>();
+        leaves = new PriorityQueue<>();
+        edgeset = new HashMap<>();
 
-//        resetEdgeScore();
+        resetEdgeFlow();
         calcVertexWeight();
+        findLeaves();
         calcEdgeScore();
-    }
-
-    public void resetEdgeScore() {
         for (Integer v : g.getGraph().keySet()) {
             for (Edge e : g.getGraph().get(v)) {
-                e.setScore(0);
+                edgeset.put(e, (double) Math.round(e.getFlow()*100)/100);
+            }
+        }
+    }
+
+    public void resetEdgeFlow() {
+        for (Integer v : g.getGraph().keySet()) {
+            for (Edge e : g.getGraph().get(v)) {
+                e.setFlow(0);
+            }
+        }
+    }
+
+    private void findLeaves() {
+
+        for (Integer v : g.getGraph().keySet()) {       // for each node
+            boolean isLeaf = true;
+            for (Edge e : g.getGraph().get(v)) {        // for each edge to v
+                int w = e.other(v);                     // for each adj node to v
+                if (distTo.get(w) > distTo.get(v)) {    // if exist dist(w) > dist(v)
+                    isLeaf = false;                     // then not leaf
+                    break;
+                }
+            }
+            if (isLeaf) {
+                leaves.add(new Node(v, distTo.get(v)));
             }
         }
     }
 
     private void calcVertexWeight() {
 
-        Set<Integer> visited = new HashSet<>();
-        Set<Integer> queue = new HashSet<>();
-        Queue<Integer> q = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();     // vertex above
+        Queue<Integer> q = new LinkedList<>();      // vertex below
+
         q.add(source);
-        queue.add(source);
+        visited.add(source);
 
-        while (!q.isEmpty()) {  // need to consider an inconnected graph
+        weight.put(source, 1);
+        distTo.put(source, 0);
 
-            int v = q.remove();
-            queue.remove(v);
-            visited.add(v);
-
-            boolean isleaf = true;
-
-            // case 1: is source
-            if (v == source) {
-                weight[v] = 1;
-                distTo[v] = 0;
-                for (Edge e : g.getGraph().get(v)) {
-                    isleaf = false;
-                    int w = e.other(v);
-                    q.add(w);
-                    queue.add(w);
-                }
-                if (isleaf) leaves.add(v);
-//                if (isleaf) leaves.add(new Node(v, distTo[v]));
-                continue;
-            }
-
-            // case 2: is nextTo source
-            boolean nextToSource = false;
-            for (Edge e : g.getGraph().get(v)) {
-                if (e.other(v) == source) {
-                    nextToSource = true;
-                    break;
-                }
-            }
-
-            if (nextToSource) {
-                weight[v] = 1;
-                distTo[v] = 1;
-                for (Edge e : g.getGraph().get(v)) {
-                    int w = e.other(v);
-                    if (!visited.contains(w)) { // a vertex is trying to enqueue child, not leaf
-                        isleaf = false;         // visited set is the vertex 'before' v.
-                        if (!queue.contains(w)) {
-                            q.add(w);
-                            queue.add(w);
-                        }
-                    }
-                }
-                if (isleaf) leaves.add(v);
-//                if (isleaf) leaves.add(new Node(v, distTo[v]));
-                continue;
-            }
-
-            // case 3: next to vertex j (not source)
-            for (Edge e : g.getGraph().get(v)) {
-
-                int w = e.other(v);
-
-                if (!visited.contains(w)) {
-                    isleaf = false;
-                    if (!queue.contains(w)) {
-                        q.add(w);
-                        queue.add(w);
-                    }
-                    continue;
-                }
-
-                if (visited.contains(w) && distTo[v] == 0) {
-                    weight[v] = weight[w];
-                    distTo[v] = distTo[w]+1;
-                }
-                else if (visited.contains(w) && distTo[v] == distTo[w]+1) {
-                    weight[v] += weight[w];
-                }
-            }
-            if (isleaf) leaves.add(v);
-//            if (isleaf) leaves.add(new Node(v, distTo[v]));
-        }
-    }
-
-    private void calcEdgeScore() {      // found problem: need to follow the path of the shortest path 
-
-        Set<Integer> visited = new HashSet<>(); // record nodes close to leafs
-        Set<Integer> queue = new HashSet<>(); // record nodes far from leafs
-        Queue<Integer> q = new LinkedList<>();
-        for (Integer i : leaves) {
-            q.add(i);
-            queue.add(i);
-        }
-
-//        while (!leaves.isEmpty()) {
-//            int i = leaves.remove().vertex;
-//            q.add(i);
-//            queue.add(i);
-//        }
-
-//        for (Node n : leaves) {     // put all stuffs into queue.
-//            queue.add(n.vertex);
-//        }
-
-        // pq version
-//        while (!leaves.isEmpty()) {
-//
-//            int v = leaves.remove().vertex;
-//            queue.remove(v);
-//            visited.add(v);
-//
-//            if (leaves.contains(v)) {  // if is leaf
-//                for (Edge e : g.getGraph().get(v)) {
-//                    int w = e.other(v);
-//                    e.setScore((double)weight[w]/weight[v]);
-//                    if (!queue.contains(w)) { // if not in search queue, add to it
-//                        leaves.add(new Node(w, distTo[w]));
-//                        queue.add(w);
-//                    }
-//                }
-//                continue;
-//            }
-//
-//            double score = 1;
-//            for (Edge e : g.getGraph().get(v)) {
-//                int w = e.other(v);
-//                if (visited.contains(w)) { // w below v
-//                    score += e.getScore();
-//                }
-//            }
-//
-//            for (Edge e : g.getGraph().get(v)) {
-//                int w = e.other(v);
-//                if (!visited.contains(w)) {
-//                    e.setScore(score * (double)weight[w]/weight[v]);
-//                    if (!queue.contains(w)) {
-//                        leaves.add(new Node(w, distTo[w]));
-//                        queue.add(w);
-//                    }
-//                }
-//            }
-//        }
-
-
-        // queue version
         while (!q.isEmpty()) {
 
             int v = q.remove();
-            queue.remove(v);
-            visited.add(v);
-
-            if (leaves.contains(v)) {  // if is leaf
-                for (Edge e : g.getGraph().get(v)) {
-                    int w = e.other(v);
-//                    e.setScore((double)weight[w]/weight[v]);
-                    e.setScore((double)weight[w]/weight[v]);
-                    if (!queue.contains(w)) { // if not in search queue, add to it
-                        q.add(w);
-                        queue.add(w);
-                    }
-                }
-                continue;
-            }
-
-            double score = 1;
-            for (Edge e : g.getGraph().get(v)) {
-                int w = e.other(v);
-                if (visited.contains(w)) { // w below v
-                    score += e.getScore();
-                }
-            }
 
             for (Edge e : g.getGraph().get(v)) {
                 int w = e.other(v);
-                if (!visited.contains(w)) {
-//                    e.setScore(score * (double)weight[w]/weight[v]);
-                    e.setScore(score * (double)weight[w]/weight[v]);
-                    if (!queue.contains(w)) {
-                        q.add(w);
-                        queue.add(w);
+                if (!visited.contains(w)) {     // if not visited, dist(w) = dist(v)+1
+                    distTo.put(w, distTo.get(v)+1);
+                    q.add(w);
+                    visited.add(w);
+                }
+                else if (distTo.get(w) == distTo.get(v) - 1) {  //if visited, dist(w)=dist(v)-1 or dist(v)
+                    if (!weight.containsKey(v)) {
+                        weight.put(v, weight.get(w));
+                    }
+                    else {
+                        weight.put(v, weight.get(v) + weight.get(w));
                     }
                 }
             }
+        }
+    }
+
+    private void calcEdgeScore() {
+
+        Set<Integer> visited = new HashSet<>();     // vertex close to leafs
+        Map<Integer, Double> vertexflow = new HashMap<>();
+
+        for (Integer i : g.getGraph().keySet()) {
+            vertexflow.put(i, 1.0);                 // all vertex receive 1 unit flow from source
+        }
+
+        for (Node n : leaves) {                     // put all vertex into search queue.
+            visited.add(n.vertex);
+        }
+
+        while (!leaves.isEmpty()) {                 // leaves is now the search queue
+
+            int v = leaves.remove().vertex;
+
+            for (Edge e : g.getGraph().get(v)) {
+                int w = e.other(v);
+                if (distTo.get(w) == distTo.get(v) - 1) {   // if w is right above v
+                    double flow = vertexflow.get(v) * (double) weight.get(w)/weight.get(v);
+                    e.setFlow(flow);
+                    vertexflow.put(w, vertexflow.get(w) + flow); // update vertex flow of w
+
+                    if (!visited.contains(w)) {
+                        visited.add(w);
+                        leaves.add(new Node(w, distTo.get(w)));
+                    }
+                }
+            }
+
         }
     }
 
@@ -252,7 +156,7 @@ public class BFS {
 
         for (Integer i : g.getGraph().keySet()) {
             for (Edge e : g.getGraph().get(i)) {
-                edgescore.put(e, e.getScore());
+                edgescore.put(e, e.getFlow());
             }
         }
 
@@ -264,12 +168,22 @@ public class BFS {
     public static void main(String[] args) {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
+//        System.out.println(g);
 
-        BFS b = null;
-        for (int s = 6; s >= 0; --s) {
-            b = new BFS(g, s);
+        for (int s = 0; s < 34; ++s ) {
+            BFS b = new BFS(g, s);
+//        System.out.println(g);
+//        System.out.println("distTo: " + b.distTo);
+//        System.out.println("weight: " + b.weight);
+//        System.out.println(b.edgeset);
+            double flow = 0;
+            for (Edge e : b.g.getGraph().get(s)) {
+                flow += e.getFlow();
+            }
+            System.out.println(flow);
         }
-        b.printEdgeScore();
+
+
 
 
 //        List<Graph> list = new LinkedList<>();

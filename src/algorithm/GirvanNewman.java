@@ -49,9 +49,9 @@ public class GirvanNewman {
                     if (!added.contains(e)) {
                         added.add(e);
                         if (!edge_score.containsKey(e))
-                            edge_score.put(e, e.getScore());
+                            edge_score.put(e, e.getFlow());
                         else
-                            edge_score.put(e, edge_score.get(e) + e.getScore());
+                            edge_score.put(e, edge_score.get(e) + e.getFlow());
                     }
                 }
             }
@@ -129,6 +129,8 @@ public class GirvanNewman {
     }
 
     public List<Graph> getConnectComponent() {return cc;}
+
+    public Graph getGraph() {return g0;}
 
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
