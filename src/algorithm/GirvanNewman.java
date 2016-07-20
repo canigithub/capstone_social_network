@@ -39,6 +39,7 @@ public class GirvanNewman {
 
         Map<Edge, Double> edge_score = new HashMap<>();
 
+        int k = 0;
         for (Integer i : g.getGraph().keySet()) {
             BFS bfs = new BFS(g, i);
 
@@ -51,14 +52,17 @@ public class GirvanNewman {
                             edge_score.put(e, e.getScore());
                         else
                             edge_score.put(e, edge_score.get(e) + e.getScore());
-                        e.setScore(0);
                     }
                 }
             }
-
         }
 
-
+        System.out.println("pass " + (k++) + ":");
+        Edge e1 = new Edge(0, 31);
+        System.out.print(e1 + "(" + edge_score.get(e1) + ") ");
+        e1 = new Edge(0, 8);
+        System.out.print(e1 + "(" + edge_score.get(e1) + ") ");
+        System.out.println();
 
         double max = -1;
         Edge ret = null;
@@ -69,7 +73,6 @@ public class GirvanNewman {
                 max = edge_score.get(e);
             }
         }
-
         System.out.println(ret + " " + String.format("%.2f", edge_score.get(ret)));
         return ret;
     }
@@ -130,15 +133,15 @@ public class GirvanNewman {
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
         GirvanNewman gn = new GirvanNewman(g);
-        System.out.println("before:");
-        for (Graph gr : gn.cc) {
-            System.out.println(gr.getGraph().keySet());
-        }
+//        System.out.println("before:");
+//        for (Graph gr : gn.cc) {
+//            System.out.println(gr.getGraph().keySet());
+//        }
         gn.split();
-        System.out.println("after:");
-        for (Graph gr : gn.cc) {
-            System.out.println(gr.getGraph().keySet());
-        }
+//        System.out.println("after:");
+//        for (Graph gr : gn.cc) {
+//            System.out.println(gr.getGraph().keySet());
+//        }
 
 //        Graph g = new Graph(2);
 //        g.addEdge(0,1);

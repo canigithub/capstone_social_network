@@ -1,8 +1,5 @@
 package graph;
 
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * Undirected edge for social network clustering.
  *
@@ -12,7 +9,6 @@ public class Edge {
     private final int v;
     private final int w;
     private double score;
-//    private double total_score;
 
     public Edge(int v, int w, double score) {
         this.v = v;
@@ -32,13 +28,11 @@ public class Edge {
         throw new IllegalArgumentException("vertex " + x + " not in this edge");
     }
 
-    public void setScore(double score) { this.score = score; }
+    public void addScore(double score) { this.score += score; }
+
+    public void setScore(double score) {this.score = score;}
 
     public double getScore() { return score; }
-
-//    public void setTotalScore(double score) {total_score = score;}
-
-//    public double getTotalScore() {return total_score;}
 
     @Override
     public boolean equals(Object o) {

@@ -67,11 +67,6 @@ public class GraphLoader {
         int V = Integer.parseInt(header[0]);
         Graph g = new Graph(V);
 
-        org.graphstream.graph.Graph gs = new SingleGraph("demo");
-        for (int i = 0; i < V; ++i) {
-            gs.addNode(Integer.toString(i));
-        }
-
         while (sc.hasNextLine()) {
             String[] toks = sc.nextLine().split(" ");
             if (toks.length != 2) {
@@ -80,20 +75,8 @@ public class GraphLoader {
             int v = Integer.parseInt(toks[0]);
             int w = Integer.parseInt(toks[1]);
             g.addEdge(v, w);
-            gs.addEdge(toks[0]+toks[1], toks[0], toks[1]);
         }
         sc.close();
-
-//        for (Node node : gs) {
-//            node.addAttribute("ui.label", node.getId());
-//        }
-//        gs.addAttribute("ui.antialias", true);
-//        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: black; " +
-//                "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
-////        gs.getNode("0").addAttribute("ui.color", Color.RED);
-////        gs.getNode("33").addAttribute("ui.color", Color.RED);
-//        gs.display();
-
         return g;
     }
 

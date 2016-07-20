@@ -17,15 +17,16 @@ import java.util.Set;
  */
 public class Draw {
 
+    public org.graphstream.graph.Graph gs;
+
     public Draw(List<Graph> graphs) {
 
-        org.graphstream.graph.Graph gs = new SingleGraph("karate club");
+        gs = new SingleGraph("karate club");
         for (Graph g : graphs) {
             for (Integer i : g.getGraph().keySet()) {
 
                 String id = Integer.toString(i);
                 gs.addNode(id);
-//                gs.getNode(id).addAttribute("ui.stylesheet", "node {fill-color: red;}");
             }
         }
 
