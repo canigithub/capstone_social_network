@@ -38,7 +38,7 @@ public class BFS {      // this need to be rewrited. all use hashmap
             throw new IllegalArgumentException("source is not in graph.");
         }
 
-        this.g = g;
+        this.g = g;     // BFS operates on the graph itself and modify it's edge flow.
         this.source = source;
         weight = new HashMap<>();
         distTo = new HashMap<>();

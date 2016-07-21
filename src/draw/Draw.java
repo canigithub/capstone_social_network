@@ -8,6 +8,7 @@ import org.graphstream.graph.implementations.SingleGraph;
 import util.GraphLoader;
 
 import java.awt.Color;
+import java.sql.Time;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,8 +70,18 @@ public class Draw {
     }
 
     public static void main(String[] args) {
+
+        long t0 = System.currentTimeMillis();
+        System.out.println("t0 = " + t0);
         Graph g = GraphLoader.loadUndirGraph(args[0]);
+        long t1 = System.currentTimeMillis();
+        System.out.println("load: " + (t1-t0));
         GirvanNewman gn = new GirvanNewman(g);
+        long t2 = System.currentTimeMillis();
+        System.out.println("split: " + (t2-t1));
         Draw d = new Draw(gn.getGraph(), gn.getConnectComponent());
+        long t3 = System.currentTimeMillis();
+        System.out.println("draw: " + (t3-t2));
+
     }
 }

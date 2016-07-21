@@ -100,6 +100,15 @@ public class Graph {
         }
     }
 
+    public void addVertex(int v) {
+
+        if (G.keySet().contains(v)) {
+            throw new IllegalArgumentException("vertex " + v + " already exists.");
+        }
+
+        G.put(v, new HashSet<>());
+    }
+
     public void addEdge(int v, int w) {
 
         validateVertex(v);
