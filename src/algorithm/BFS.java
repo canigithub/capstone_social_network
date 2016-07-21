@@ -46,7 +46,8 @@ public class BFS {      // this need to be rewrited. all use hashmap
         edgeset = new HashMap<>();
 
         resetEdgeFlow();
-        calcVertexWeight();
+        calcVertexWeight(); // this must be in constructor
+                            // below are not necessarily in ctor.
         findLeaves();
         calcEdgeScore();
         for (Integer v : g.getGraph().keySet()) {

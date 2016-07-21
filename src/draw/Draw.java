@@ -14,74 +14,81 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by gerald on 7/19/16.
+ * draw graphs
  */
 public class Draw {
 
-    public org.graphstream.graph.Graph gs;
+    public static org.graphstream.graph.Graph drawSingleGraph(Graph g, String name) {
 
-    public Draw(Graph g0, List<Graph> graphs) {
+        org.graphstream.graph.Graph gs = new SingleGraph(name);
 
-        gs = new SingleGraph("karate club");
-
-        for (Integer i : g0.getGraph().keySet()) {
+        for (Integer i : g.getGraph().keySet()) {
             String id = Integer.toString(i);
             gs.addNode(id);
         }
 
-        for (Node node : gs) {
-            node.addAttribute("ui.label", node.getId());
-        }
-
-        Set<Edge> drawed = new HashSet<>();
-
-
-        for (Integer v : g0.getGraph().keySet()) {
-            for (Edge e : g0.getGraph().get(v)) {
+        Set<Edge> drawededge = new HashSet<>();
+        for (Integer v : g.getGraph().keySet()) {
+            for (Edge e : g.getGraph().get(v)) {
                 int w = e.other(v);
-                if (!drawed.contains(e)) {
-                    drawed.add(e);
+                if (!drawededge.contains(e)) {
+                    drawededge.add(e);
                     gs.addEdge(e.toString(), Integer.toString(v), Integer.toString(w));
                 }
             }
         }
 
+        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: orange; " +
+                "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
+        gs.addAttribute("ui.antialias", true);
+        gs.display();
+        return gs;
+    }
+
+    public static void drawGroupedSingleGraph(Graph g, List<Graph> group, String name) {
+
+        org.graphstream.graph.Graph gs = drawSingleGraph(g, name);
 
         gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: orange; " +
                 "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
+        gs.addAttribute("ui.antialias", true);
 
         int k = 0;
-        for (Graph g : graphs) {
-            for (Integer i : g.getGraph().keySet()) {
+        for (Graph i : group) {
+            for (Integer v : i.getGraph().keySet()) {
+                Node node;
                 switch (k) {
                     case 0:
-                        gs.getNode(Integer.toString(i)).addAttribute("ui.color", Color.RED);
+                        node = gs.getNode(Integer.toString(v));
+                        node.addAttribute("ui.color", Color.RED);
+                        System.out.println(node.getId());
                         break;
                     case 1:
-                        gs.getNode(Integer.toString(i)).addAttribute("ui.color", Color.BLACK);
+                        node = gs.getNode(Integer.toString(v));
+                        node.addAttribute("ui.color", Color.BLACK);
+                        System.out.println(node.getId());
                     default:
                 }
             }
             k++;
         }
 
-        gs.addAttribute("ui.antialias", true);
         gs.display();
     }
 
     public static void main(String[] args) {
 
-        long t0 = System.currentTimeMillis();
-        System.out.println("t0 = " + t0);
-        Graph g = GraphLoader.loadUndirGraph(args[0]);
-        long t1 = System.currentTimeMillis();
-        System.out.println("load: " + (t1-t0));
-        GirvanNewman gn = new GirvanNewman(g);
-        long t2 = System.currentTimeMillis();
-        System.out.println("split: " + (t2-t1));
-        Draw d = new Draw(gn.getGraph(), gn.getConnectComponent());
-        long t3 = System.currentTimeMillis();
-        System.out.println("draw: " + (t3-t2));
+//        long t0 = System.currentTimeMillis();
+//        System.out.println("t0 = " + t0);
+//        Graph g = GraphLoader.loadUndirGraph(args[0]);
+//        long t1 = System.currentTimeMillis();
+//        System.out.println("load: " + (t1-t0));
+//        GirvanNewman gn = new GirvanNewman(g);
+//        long t2 = System.currentTimeMillis();
+//        System.out.println("split: " + (t2-t1));
+//        Draw d = new Draw(gn.getGraph(), gn.getConnectComponent());
+//        long t3 = System.currentTimeMillis();
+//        System.out.println("draw: " + (t3-t2));
 
     }
 }

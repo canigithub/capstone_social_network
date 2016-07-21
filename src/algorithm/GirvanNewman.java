@@ -1,5 +1,6 @@
 package algorithm;
 
+import draw.Draw;
 import graph.Edge;
 import graph.Graph;
 import util.GraphLoader;
@@ -11,7 +12,7 @@ import java.util.*;
  */
 public class GirvanNewman {
 
-    private final Graph g0; // original graph
+    private final Graph g0; // original uncutted graph
     private Graph g;
     private List<Graph> cc; // connected components of graph g
 
@@ -19,7 +20,6 @@ public class GirvanNewman {
 
         this.g0 = new Graph(g);
         this.g = new Graph(g);
-//        this.cc = this.g.getConnectedComponent();
         split();
     }
 
@@ -98,9 +98,7 @@ public class GirvanNewman {
     private int interCommunityEdgeCount(int i, int j) {
 
         if (i == j) return cc.get(i).E();
-
         Graph ci = cc.get(i), cj = cc.get(j);
-
         int count = 0;
         for (Integer v : ci.getGraph().keySet()) {
             for (Edge e : g0.getGraph().get(v)) {
@@ -118,9 +116,10 @@ public class GirvanNewman {
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
         GirvanNewman gn = new GirvanNewman(g);
-        gn.split();
-        System.out.println(gn.cc.get(0).getGraph().keySet());
-        System.out.println(gn.cc.get(1).getGraph().keySet());
+//        System.out.println(gn.cc.size());
+        Draw.drawGroupedSingleGraph(gn.g0, gn.cc, "karate");
+//        System.out.println(gn.cc.get(0).getGraph().keySet());
+//        System.out.println(gn.cc.get(1).getGraph().keySet());
 
     }
 }

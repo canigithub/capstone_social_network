@@ -1,5 +1,6 @@
 package util;
 
+import draw.Draw;
 import graph.Graph;
 
 import java.io.File;
@@ -8,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by gerald on 7/20/16.
+ * gml: graph modeling language
  */
 public class GMLFileLoader {
 
@@ -29,49 +30,62 @@ public class GMLFileLoader {
             return null;
         }
 
-        String line = nextLineWhen(sc, "\\s*directed\\s[01]"); // make sure it's undirected
-        if (line.charAt(line.length()-1) == '1') {
-            throw new IllegalArgumentException("must input undirect graph file");
+        String line = nextLineAt(sc, "\\s*directed\\s[01]"); // make sure it's undirected
+
+        if (line == null) {
+            throw new IllegalArgumentException("invalid file.");
+        }
+
+        if (line.charAt(line.length()-1) != '0') {
+            throw new IllegalArgumentException("file must be undirected graph");
         }
 
         Graph g = new Graph();
 
-        nextLineWhen(sc, "\\s*(node)?\\s*\\[");  // make sure pointer move to vertex section
+        nextLineAt(sc, "\\s*(node)?\\s*\\[");  // make sure pointer move to vertex section
 
-//        line = nextLineWhen(sc, "\\s*id\\s\\d+");
-
-
-        while (sc.hasNextLine()) {
-//            line = nextLineWhen(sc, "(\\s*id\\s\\d+)|(\\s*source\\s\\d+)|(\\s*target\\s\\d+)");
-            line = nextLineWhen(sc, "\\s*(id|source|target)\\s\\d+");
+        int s = -1, t;
+        while (true) {
+//            line = nextLineAt(sc, "(\\s*id\\s\\d+)|(\\s*source\\s\\d+)|(\\s*target\\s\\d+)");
+            line = nextLineAt(sc, "\\s*(id|source|target)\\s+\\d+");
             if (line == null) break;
-            String[] token = line.split("\\s");
-            System.out.println(token[token.length-2] + "," + token[token.length-1]);
+            String[] tok = line.split("\\s+");
+            if (tok[tok.length-2].equals("id")) {
+                g.addVertex(Integer.parseInt(tok[tok.length-1]));
+            }
+            else if (tok[tok.length-2].equals("source")) {
+                s = Integer.parseInt(tok[tok.length-1]);
+            }
+            else if (tok[tok.length-2].equals("target")) {
+                if (s == -1) {  // assume input vertex id are all positive or zero.
+                    throw new IllegalArgumentException("invalid file format. " +
+                            "source is not folowed by target.");
+                }
+                t = Integer.parseInt(tok[tok.length-1]);
+                g.addEdge(s, t);
+                s = -1;
+            }
+            else {
+                throw new IllegalArgumentException("incorrect file input format.");
+            }
         }
-
-//        while (sc.hasNextLine()) {
-//            System.out.println(sc.nextLine());
-//        }
-
         sc.close();
-        return null;
+        return g;
     }
 
-    private static String nextLineWhen(Scanner sc, String regex) {
-
+    private static String nextLineAt(Scanner sc, String regex) {
         Pattern p = Pattern.compile(regex);
-
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             Matcher m = p.matcher(line);
             if (m.matches()) return line;
         }
-
         return null;
     }
 
     public static void main(String[] args) {
 
         Graph g = UndirGraphLoader(args[0]);
+        Draw.drawSingleGraph(g, "dolphins");
     }
 }
