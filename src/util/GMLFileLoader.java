@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public class GMLFileLoader {
 
-    public static Graph UndirGraphLoader(String filename) {
+    public static Graph loadUndirGraph(String filename) {
         Pattern p_fname = Pattern.compile("(/\\w+)+\\.gml");
         Matcher m_fname = p_fname.matcher(filename);
 
@@ -85,7 +85,7 @@ public class GMLFileLoader {
 
     public static void main(String[] args) {
 
-        Graph g = UndirGraphLoader(args[0]);
+        Graph g = loadUndirGraph(args[0]);
         Draw.drawSingleGraph(g, "dolphins");
     }
 }

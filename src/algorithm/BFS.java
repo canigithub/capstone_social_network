@@ -9,8 +9,10 @@ import java.util.*;
 /**
  * Breadth first search
  * given a source vertex, calculate all vertex weights and edge scores
+ *
+ *
  */
-public class BFS {      // this need to be rewrited. all use hashmap
+public class BFS {
 
     private Graph g;
     private int source;

@@ -61,12 +61,10 @@ public class Draw {
                     case 0:
                         node = gs.getNode(Integer.toString(v));
                         node.addAttribute("ui.color", Color.RED);
-                        System.out.println(node.getId());
                         break;
                     case 1:
                         node = gs.getNode(Integer.toString(v));
                         node.addAttribute("ui.color", Color.BLACK);
-                        System.out.println(node.getId());
                     default:
                 }
             }

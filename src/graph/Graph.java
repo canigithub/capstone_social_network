@@ -9,6 +9,10 @@ import java.util.*;
  * undirected graph for graph clustering problem.
  * single edge.
  * need to check if the graph is connected. (use bfs)
+ *
+ * optimization idea:
+ *  # add mutable and inmutable getGraph() methods.
+ *  # improve getConnectedVertex().
  */
 public class Graph {
 
@@ -193,7 +197,7 @@ public class Graph {
         return cc;
     }
 
-    private Graph createSubgraph(Set<Integer> vertex) {
+    public Graph createSubgraph(Set<Integer> vertex) {
         Graph subg = new Graph(vertex);
         for (Integer v : subg.G.keySet()) {
             for (Edge e : this.G.get(v)) {
@@ -204,6 +208,14 @@ public class Graph {
             }
         }
         return subg;
+    }
+
+    public List<Graph> createSubgraph(List<Set<Integer>> sets) {
+        List<Graph> list = new LinkedList<>();
+        for (Set<Integer> set : sets) {
+            list.add(createSubgraph(set));
+        }
+        return list;
     }
 
     @Override
