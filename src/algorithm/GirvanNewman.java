@@ -26,6 +26,8 @@ import java.util.*;
  * Improvment idea: could penalize a cut if one of it's split has size
  * less than a threshold.
  *
+ * !!! The modularity for karate club data on bisection is not solved yet!!!
+ *
  */
 public class GirvanNewman {
 
