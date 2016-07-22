@@ -23,6 +23,7 @@ import java.util.*;
  *
  * Improvment idea: could penalize a cut if one of it's split has size
  * less than a threshold.
+ * also, need to consider case of dangling node.
  *
  * !!The modularity for karate club data on bisection is not solved yet!!
  *
@@ -35,11 +36,13 @@ public class GirvanNewman {
     private double maxModularity;
 
     public GirvanNewman(Graph g) {
+        this(g, g.V()/3);
+    }
 
+    public GirvanNewman(Graph g, int max_pass) {
         original_graph = new Graph(g);      // copy the input graph
         partitions = new ArrayList<>();
-        cluster(20);
-
+        cluster(max_pass);
     }
 
     public void cluster(int max_pass) {
@@ -50,10 +53,11 @@ public class GirvanNewman {
         int pass = 0;
         int localpeakcnt = 0;
         boolean decrease = true;
+        final int minsplitsize = 3;
 
         while (pass < max_pass) {
-
-            System.out.print("pass " + String.format("%2d", pass) + ": ");
+            ++pass;
+            System.out.print("pass " + String.format("%3d", pass) + ": ");
 
             List<Set<Integer>> temp = new LinkedList<>();
             for (Set<Integer> set : sets) {
@@ -64,7 +68,7 @@ public class GirvanNewman {
             List<Set<Integer>> setsNextIter = new LinkedList<>();
             for (Set<Integer> set : sets) {
 
-                if (set.size() == 1) {
+                if (set.size() <= minsplitsize) {  // if set size <= 2 it must generate 1 node
                     continue;
                 }
 
@@ -75,6 +79,10 @@ public class GirvanNewman {
                 }
 
                 Group group = new Group(temp);
+
+//                if (pass == 6) {
+//                    Draw.drawGroupedSingleGraph(original_graph, group.group, "debug");
+//                }
 
                 if (max_group == null) {
                     max_group = group;
@@ -96,8 +104,13 @@ public class GirvanNewman {
                 temp.add(set);
             }
 
+            if (max_group == null) {
+                System.out.println("no valid partition.");
+                break;
+            }
+
             System.out.print("modularity=" + String.format("%.5f", max_group.modularity) + "  \t");
-            if (++pass%4 == 0) System.out.println();
+            if (pass % 4 == 0) System.out.println();
 
             if (Double.compare(max_group.modularity, maxModularity) < 0) {
                 if (!decrease) {
@@ -112,11 +125,9 @@ public class GirvanNewman {
             }
 
             sets = setsNextIter;
-        }
-    }
 
-    public void cluster() {
-        cluster(original_graph.V());
+
+        }
     }
 
     private List<Set<Integer>> split(Set<Integer> set) {  // split a connected graph
@@ -167,7 +178,7 @@ public class GirvanNewman {
     }
 
     public List<Set<Integer>> getBestCluster() {
-        if (partitions.size() == 1) {
+        if (partitions.size() == 0) {
             System.out.println("no good partition is found.");
             return null;
         }
@@ -218,6 +229,12 @@ public class GirvanNewman {
 
 //            printModularity(mat);
 
+            // penalize small size
+//            int minsize = original_graph.V();
+//            for (Set<Integer> set : sets) {
+//                minsize = Math.min(minsize, set.size());
+//            }
+//            m = 1/Math.exp(1/m);
             return m;
         }
 
@@ -274,9 +291,15 @@ public class GirvanNewman {
 //        Draw.drawSingleGraph(g, "funny");
         GirvanNewman gn = new GirvanNewman(g);
 //        System.out.println(gn.partitions.size());
-        System.out.println("size of best cluster: " + gn.getBestCluster().size());
+        System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
 //        System.out.println(gn.partitions);
         Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
+
+//        for (int i = 1; i <= 5; ++i) {
+//            GirvanNewman gn = new GirvanNewman(g, i);
+//            System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
+//            Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
+//        }
 
     }
 }

@@ -67,6 +67,11 @@ public class GraphLoader {
         int V = Integer.parseInt(header[0]);
         Graph g = new Graph(V);
 
+//        org.graphstream.graph.Graph gs = new SingleGraph("demo");
+//        for (int i = 0; i < V; ++i) {
+//            gs.addNode(Integer.toString(i));
+//        }
+
         while (sc.hasNextLine()) {
             String[] toks = sc.nextLine().split(" ");
             if (toks.length != 2) {
@@ -75,6 +80,7 @@ public class GraphLoader {
             int v = Integer.parseInt(toks[0]);
             int w = Integer.parseInt(toks[1]);
             g.addEdge(v, w);
+//            gs.addEdge(toks[0]+toks[1], toks[0], toks[1]);
         }
         sc.close();
 
@@ -90,6 +96,5 @@ public class GraphLoader {
 
         return g;
     }
-
 
 }

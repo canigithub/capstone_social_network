@@ -1,5 +1,6 @@
 package graph;
 
+import draw.Draw;
 import util.GraphLoader;
 
 import java.util.*;
@@ -111,6 +112,7 @@ public class Graph {
         }
 
         G.put(v, new HashSet<>());
+        V++;
     }
 
     public void addEdge(int v, int w) {
@@ -126,14 +128,20 @@ public class Graph {
         E++;
     }
 
-    public void removeVertex(int v) {   // for now, only vertex with no edge can be removed
+    public void removeVertex(int v) {
         validateVertex(v);
-        if (G.get(v) == null || G.get(v).size() == 0) {
-            G.remove(v);
+        Set<Integer> adjvertex = new HashSet<>();
+        for (Edge e : G.get(v)) {
+            int w = e.other(v);
+            adjvertex.add(w);
         }
-        else {
-            throw new IllegalArgumentException("can't rm this vertex.");
+
+        for (Integer w : adjvertex) {
+            removeEdge(v, w);
         }
+
+        G.remove(v);
+        V--;
     }
 
     public void removeEdge(int v, int w) {
@@ -251,10 +259,11 @@ public class Graph {
 
         Graph g = GraphLoader.loadUndirGraph(args[0]);
 
-        g.removeEdge(33, 8);
-        List<Graph> cc = g.getConnectedComponent();
-        System.out.println(cc);
-        System.out.println(g.E());
+//        List<Graph> cc = g.getConnectedComponent();
+//        System.out.println(cc);
+//        System.out.println(g.E());
+        g.removeVertex(33);
+        Draw.drawSingleGraph(g, "funny");
     }
 
 }
