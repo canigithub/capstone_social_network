@@ -25,8 +25,15 @@ import java.util.*;
  * Improvment idea: could penalize a cut if one of it's split has size
  * less than a threshold.
  * also, need to consider case of dangling node.
+ * A Feasible idea: adaptivly decrease min-set-size.
+ *
+ * Dangling node cases and single vertex cluster dealed. Should analysis
+ * the difference with and without it. --> update: there's no sufficient
+ *
  *
  * !!The modularity for karate club data on bisection is not solved yet!!
+ *
+ *
  *
  */
 public class GirvanNewman {
@@ -89,10 +96,6 @@ public class GirvanNewman {
 
                 Group group = new Group(temp);
 
-//                if (pass == 6) {
-//                    Draw.drawGroupedSingleGraph(original_graph, group.group, "debug");
-//                }
-
                 if (max_group == null) {
                     max_group = group;
                     for (Set<Integer> s : temp) {
@@ -114,7 +117,7 @@ public class GirvanNewman {
             }
 
             if (max_group == null) {
-                System.out.println("no valid partition.");
+                System.out.print("no valid partition");
                 break;
             }
 
@@ -156,44 +159,49 @@ public class GirvanNewman {
             int v = cutedge.either();
             int w = cutedge.other(v);
 
+            // This section deals with [Single Vertex Cluster] problem.
+            // for a vertex that is not dangling vertex, it's unreasonable for this
+            // vertex itself to be a cluster.
+            // here, temporarily remove this node and edge until find a new edge to cut.
+            // after a proper edge is found, restore the temporarily removed nodes and edges.
+            Stack<Integer> x = new Stack<>();
+            Stack<Integer> y = new Stack<>();
+            while (g.getGraph().get(v).size() == 1 || g.getGraph().get(w).size() == 1) {
 
-//            Stack<Integer> p = new Stack<>();
-//            Stack<Integer> q = new Stack<>();
-//            while (original_graph.getGraph().get(v).size() == 1 || original_graph.getGraph().get(w).size() == 1) {
-//
-//                if (original_graph.getGraph().get(v).size() == 1) {
-//                    p.push(v);
-//                    q.push(w);
-//                }
-//                else if (original_graph.getGraph().get(w).size() == 1) {
-//                    p.push(w);
-//                    q.push(v);
-//                } else {
-//                    throw new IllegalArgumentException("something wrong dangling node");
-//                }
-//                g.removeVertex(p.peek());
-//
-//                cutedge = findCutEdge(g);
-//
-//                if (cutedge == null) {
-//                    throw new NoValidEdgeException("no valid edge remains");
-//                }
-//                v = cutedge.either();
-//                w = cutedge.other(v);
-//            }
+                if (g.getGraph().get(v).size() == 1) {
+                    x.push(v);
+                    y.push(w);
+                }
+                else if (g.getGraph().get(w).size() == 1) {
+                    x.push(w);
+                    y.push(v);
+                } else {
+                    throw new IllegalArgumentException("something wrong dangling node");
+                }
+                g.removeVertex(x.peek());
+
+                cutedge = findCutEdge(g);
+
+                if (cutedge == null) {
+                    throw new NoValidEdgeException("no valid edge remains");
+                }
+                v = cutedge.either();
+                w = cutedge.other(v);
+            }
 
             g.removeEdge(cutedge);
 
-//            while (!p.isEmpty()) {
-//                v = p.pop();
-//                w = q.pop();
-//                g.addVertex(v);
-//                g.addEdge(v, w);
-//            }
-//
-//            if (!q.isEmpty()) {
-//                throw new IllegalArgumentException("something wrong stack q");
-//            }
+            // This section deals with [Single Vertex Cluster] problem. (continue)
+            // restore the temorarily removed nodes and edges
+            while (!x.isEmpty()) {
+                v = x.pop();
+                w = y.pop();
+                g.addVertex(v);
+                g.addEdge(v, w);
+            }
+            if (!y.isEmpty()) {
+                throw new IllegalArgumentException("something wrong stack y");
+            }
 
             sets = g.getConnectedVertex();
         }
@@ -343,9 +351,11 @@ public class GirvanNewman {
 //        Draw.drawSingleGraph(g, "funny");
         GirvanNewman gn = new GirvanNewman(g);
 //        System.out.println(gn.partitions.size());
-        System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
+        if (gn.getBestCluster() != null) {
+            System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
 //        System.out.println(gn.partitions);
-        Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
+            Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
+        }
 
 //        for (int i = 1; i <= 5; ++i) {
 //            GirvanNewman gn = new GirvanNewman(g, i);

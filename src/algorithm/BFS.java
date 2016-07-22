@@ -67,7 +67,7 @@ public class BFS {
         }
     }
 
-    private void findLeaves() {
+    private void findLeaves() {     // the graph may not be connected
 
         for (Integer v : g.getGraph().keySet()) {       // for each node
             boolean isLeaf = true;
