@@ -126,6 +126,16 @@ public class Graph {
         E++;
     }
 
+    public void removeVertex(int v) {   // for now, only vertex with no edge can be removed
+        validateVertex(v);
+        if (G.get(v) == null || G.get(v).size() == 0) {
+            G.remove(v);
+        }
+        else {
+            throw new IllegalArgumentException("can't rm this vertex.");
+        }
+    }
+
     public void removeEdge(int v, int w) {
 
         validateVertex(v);
@@ -152,14 +162,12 @@ public class Graph {
         removeEdge(v, w);
     }
 
-    public boolean isAdjacent(int v, int w) {
-        validateVertex(v);
-        validateVertex(w);
-        for (Edge e : G.get(v)) {
-            int i = e.other(v);
-            if (i == w) return true;
+    public void removeVertexWithNoEdge() {
+        for (int v = 0; v < 1000; ++v) {
+            if (G.get(v) == null || G.get(v).size() == 0) {
+                removeVertex(v);
+            }
         }
-        return false;
     }
 
     public List<Set<Integer>> getConnectedVertex() {

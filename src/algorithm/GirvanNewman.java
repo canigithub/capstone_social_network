@@ -18,15 +18,13 @@ import java.util.*;
  *
  * could find two local peaks before terminating splitting.
  * also, could terminate if a single node is splited.
- *
- * anyway, the second to the last partition is the best one.
- *
- * ok result on football.gml with 8.
+ * also, could use a pq to manage connected component, then you can
+ * extract the largest k components
  *
  * Improvment idea: could penalize a cut if one of it's split has size
  * less than a threshold.
  *
- * !!! The modularity for karate club data on bisection is not solved yet!!!
+ * !!The modularity for karate club data on bisection is not solved yet!!
  *
  */
 public class GirvanNewman {
@@ -36,113 +34,26 @@ public class GirvanNewman {
     private List<Group> partitions;         // partitions from each cut. starting from 0 cut.
     private double maxModularity;
 
-    private class Group implements Comparable<Group>{
-
-        public final List<Set<Integer>> group;
-        public final double modularity;
-
-        public Group(List<Set<Integer>> sets) {
-            this.group = sets;
-            modularity = calcModularity(sets);
-        }
-
-        public double calcModularity(List<Set<Integer>> sets) {
-
-            int k = sets.size();
-            final double[][] mat = new double[k][k];
-
-            for (int i = 0; i < k; ++i) {
-                for (int j = i; j < k; ++j) {
-                    mat[i][j] = interCommunityEdgeCount(sets, i, j)/(double) original_graph.E();
-                    mat[j][i] = mat[i][j];
-                }
-            }
-
-            double[] a = new double[k];
-            for (int i = 0; i < k; ++i) {
-                for (int j = 0; j < k; ++j) {
-                    a[i] += mat[i][j];      // a[i]
-                }
-            }
-
-            double m = 0.;
-            for (int i = 0; i < k; ++i) {
-                m += (mat[i][i] - a[i]*a[i]);
-            }
-
-//            printModularity(mat);
-            return m;
-        }
-
-        public int interCommunityEdgeCount(List<Set<Integer>> sets, int i, int j) {
-
-            if (i == j) {
-                Graph graph = original_graph.createSubgraph(sets.get(i));
-                return graph.E();
-            }
-
-            Set<Integer> ci = sets.get(i), cj = sets.get(j);
-            int count = 0;
-
-            for (Integer v : ci) {
-                for (Edge e : original_graph.getGraph().get(v)) {
-                    int w = e.other(v);
-                    if (cj.contains(w)) {
-                        count++;
-//                        System.out.println(e);
-                    }
-                }
-            }
-            return count;
-        }
-
-        private void printModularity(double[][] mat) {
-            int k = mat.length;
-            for (int i = 0; i < k; ++i) {
-                System.out.print("[");
-                for (int j = 0; j < k; ++j) {
-                    System.out.print(" " + String.format("%.2f", mat[i][j]));
-                }
-                System.out.println(" ]");
-            }
-        }
-
-        @Override
-        public int compareTo(Group that) {
-            return Double.compare(modularity, that.modularity);
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("modularity=" + modularity + NEWLINE);
-            for (Set<Integer> set : group) {
-                sb.append(set + NEWLINE);
-            }
-            return sb.toString();
-        }
-    }
-
     public GirvanNewman(Graph g) {
 
         original_graph = new Graph(g);      // copy the input graph
         partitions = new ArrayList<>();
-        cluster(8);
+        cluster(20);
 
     }
 
-    public void cluster(int max_count) {
+    public void cluster(int max_pass) {
         // original uncutted graph: lastsplit = -1
         List<Set<Integer>> sets = original_graph.getConnectedVertex();
-        Group group = new Group(sets);
-        partitions.add(group);
-        maxModularity = group.modularity;
+//        Group group = null;
+        maxModularity = 0;
+        int pass = 0;
+        int localpeakcnt = 0;
+        boolean decrease = true;
 
-        int count = 0;
-//        boolean singleVertex = false;
-        while (count < max_count) {
+        while (pass < max_pass) {
 
-            System.out.println("pass :" + count++);
+            System.out.print("pass " + String.format("%2d", pass) + ": ");
 
             List<Set<Integer>> temp = new LinkedList<>();
             for (Set<Integer> set : sets) {
@@ -154,8 +65,6 @@ public class GirvanNewman {
             for (Set<Integer> set : sets) {
 
                 if (set.size() == 1) {
-//                    singleVertex = true;
-//                    break;
                     continue;
                 }
 
@@ -165,7 +74,7 @@ public class GirvanNewman {
                     temp.add(s);
                 }
 
-                group = new Group(temp);
+                Group group = new Group(temp);
 
                 if (max_group == null) {
                     max_group = group;
@@ -187,17 +96,21 @@ public class GirvanNewman {
                 temp.add(set);
             }
 
-            System.out.println("current pass max modularity = " + max_group.modularity);
+            System.out.print("modularity=" + String.format("%.5f", max_group.modularity) + "  \t");
+            if (++pass%4 == 0) System.out.println();
 
-//            if (singleVertex) break;
-
-            if (max_group.modularity < maxModularity) {
-                break;
+            if (Double.compare(max_group.modularity, maxModularity) < 0) {
+                if (!decrease) {
+                    localpeakcnt++;
+                }
+                decrease = true;
+                if (localpeakcnt == 2) break;
             } else {
+                maxModularity = max_group.modularity;
                 partitions.add(max_group);
+                decrease = false;
             }
 
-            System.out.println("setsNextIter: " + setsNextIter);
             sets = setsNextIter;
         }
     }
@@ -230,6 +143,7 @@ public class GirvanNewman {
         Map<Edge, Double> edgeflow = new HashMap<>();
 
         for (Integer i : g.getGraph().keySet()) {
+
             BFS bfs = new BFS(g, i);
 
             Map<Edge, Double> edgeset = bfs.getEdgeSet();
@@ -257,15 +171,110 @@ public class GirvanNewman {
             System.out.println("no good partition is found.");
             return null;
         }
-        return partitions.get(partitions.size()-2).group;
+
+
+        return partitions.get(partitions.size()-1).group;
     }
 
     public Graph getOriginalGraph() {return original_graph;}
 
+    private class Group implements Comparable<Group>{
+
+        public final List<Set<Integer>> group;
+        public final double modularity;
+
+        public Group(List<Set<Integer>> sets) {
+//            this.group = sets;
+            this.group = new LinkedList<>();    // must deep copy of set
+            for (Set<Integer> set : sets) {
+                this.group.add(set);
+            }
+            modularity = calcModularity(sets);
+        }
+
+        public double calcModularity(List<Set<Integer>> sets) {
+
+            int k = sets.size();
+            final double[][] mat = new double[k][k];
+
+            for (int i = 0; i < k; ++i) {
+                for (int j = i; j < k; ++j) {
+                    mat[i][j] = interCommunityEdgeCount(sets, i, j)/(double) original_graph.E();
+                    mat[j][i] = mat[i][j];
+                }
+            }
+
+            double[] a = new double[k];
+            for (int i = 0; i < k; ++i) {
+                for (int j = 0; j < k; ++j) {
+                    a[i] += mat[i][j];
+                }
+            }
+
+            double m = 0.;
+            for (int i = 0; i < k; ++i) {
+                m += (mat[i][i] - a[i]*a[i]);
+            }
+
+//            printModularity(mat);
+
+            return m;
+        }
+
+        public int interCommunityEdgeCount(List<Set<Integer>> sets, int i, int j) {
+
+            if (i == j) {
+                Graph graph = original_graph.createSubgraph(sets.get(i));
+                return graph.E();
+            }
+
+            Set<Integer> ci = sets.get(i), cj = sets.get(j);
+            int count = 0;
+
+            for (Integer v : ci) {
+                for (Edge e : original_graph.getGraph().get(v)) {
+                    int w = e.other(v);
+                    if (cj.contains(w)) count++;
+                }
+            }
+            return count;
+        }
+
+        private void printModularity(double[][] mat) {
+            int k = mat.length;
+            for (int i = 0; i < k; ++i) {
+                System.out.print("[");
+                for (int j = 0; j < k; ++j) {
+                    System.out.print(" " + String.format("%.2f", mat[i][j]));
+                }
+                System.out.println(" ]");
+            }
+        }
+
+        @Override
+        public int compareTo(Group that) {
+            return Double.compare(modularity, that.modularity);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("modularity=" + modularity + NEWLINE);
+            for (Set<Integer> set : group) {
+                sb.append(set + NEWLINE);
+            }
+            return sb.toString();
+        }
+    }
+
     public static void main(String[] args) {
 //        Graph g = GraphLoader.loadUndirGraph(args[0]);
         Graph g = GMLFileLoader.loadUndirGraph(args[0]);
+//        g.removeVertexWithNoEdge(); // just for better visualization
+//        Draw.drawSingleGraph(g, "funny");
         GirvanNewman gn = new GirvanNewman(g);
+//        System.out.println(gn.partitions.size());
+        System.out.println("size of best cluster: " + gn.getBestCluster().size());
 //        System.out.println(gn.partitions);
         Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
 

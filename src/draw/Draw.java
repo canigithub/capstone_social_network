@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 /**
  * draw graphs
  */
@@ -47,7 +48,24 @@ public class Draw {
 
     public static void drawGroupedSingleGraph(Graph g, List<Set<Integer>> group, String name) {
 
-        org.graphstream.graph.Graph gs = drawSingleGraph(g, name);
+//        org.graphstream.graph.Graph gs = drawSingleGraph(g, name);
+        org.graphstream.graph.Graph gs = new SingleGraph(name);
+
+        for (Integer i : g.getGraph().keySet()) {
+            String id = Integer.toString(i);
+            gs.addNode(id);
+        }
+
+        Set<Edge> drawededge = new HashSet<>();
+        for (Integer v : g.getGraph().keySet()) {
+            for (Edge e : g.getGraph().get(v)) {
+                int w = e.other(v);
+                if (!drawededge.contains(e)) {
+                    drawededge.add(e);
+                    gs.addEdge(e.toString(), Integer.toString(v), Integer.toString(w));
+                }
+            }
+        }
 
         gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: orange; " +
                 "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
@@ -57,7 +75,7 @@ public class Draw {
         for (Set<Integer> i : group) {
             for (Integer v : i) {
                 Node node = gs.getNode(Integer.toString(v));
-                switch (k) {
+                switch (k%10) {
                     case 0:
                         node.addAttribute("ui.color", Color.RED); break;
                     case 1:
@@ -76,6 +94,8 @@ public class Draw {
                         node.addAttribute("ui.color", Color.PINK); break;
                     case 8:
                         node.addAttribute("ui.color", Color.BLACK); break;
+                    case 9:
+                        node.addAttribute("ui.color", Color.WHITE); break;
                     default:
                 }
             }
