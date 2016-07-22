@@ -30,19 +30,25 @@ public class GMLFileLoader {
             return null;
         }
 
-        String line = nextLineAt(sc, "\\s*directed\\s[01]"); // make sure it's undirected
+        String line;
 
+
+        line = nextLineAt(sc, "\\s*directed\\s[01]|\\s*(node)?\\s*\\[");    // go to directed line or node [
+                                                                            // some file dont have directed line.
         if (line == null) {
             throw new IllegalArgumentException("invalid file.");
         }
 
-        if (line.charAt(line.length()-1) != '0') {
-            throw new IllegalArgumentException("file must be undirected graph");
+        Pattern p_directed = Pattern.compile("\\s*directed\\s[01]");        // check if exist directed line.
+        Matcher m_directed = p_directed.matcher(line);
+        if (m_directed.matches()) {
+            if (line.charAt(line.length()-1) != '0') {
+                throw new IllegalArgumentException("file must be undirected graph");
+            }
+            nextLineAt(sc, "\\s*(node)?\\s*\\[");                           // move pointer to vertex section
         }
 
         Graph g = new Graph();
-
-        nextLineAt(sc, "\\s*(node)?\\s*\\[");  // make sure pointer move to vertex section
 
         int s = -1, t;
         while (true) {

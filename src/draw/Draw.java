@@ -76,6 +76,10 @@ public class Draw {
 
     public static void main(String[] args) {
 
+        Graph g = GraphLoader.loadUndirGraph(args[0]);
+        drawSingleGraph(g, "funny");
+
+
 //        long t0 = System.currentTimeMillis();
 //        System.out.println("t0 = " + t0);
 //        Graph g = GraphLoader.loadUndirGraph(args[0]);

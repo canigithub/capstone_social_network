@@ -1,5 +1,6 @@
 package algorithm;
 
+import com.sun.org.apache.regexp.internal.RE;
 import draw.Draw;
 import graph.Edge;
 import graph.Graph;
@@ -14,12 +15,18 @@ import java.util.*;
  * notice: passing graph as parameters using vertex set and global
  * variable original_graph since can't make too many copys of graph
  * (edges use a lot of memory)
+ *
+ * could find two local peaks before terminating splitting.
+ * also, could terminate if a single node is splited.
+ *
+ * anyway, the second to the last partition is the best one.
  */
 public class GirvanNewman {
 
     private static final String NEWLINE = System.getProperty("line.separator");
     private final Graph original_graph;     // original uncutted graph
     private List<Group> partitions;         // partitions from each cut. starting from 0 cut.
+    private double maxModularity;
 
     private class Group implements Comparable<Group>{
 
@@ -34,11 +41,11 @@ public class GirvanNewman {
         public double calcModularity(List<Set<Integer>> sets) {
 
             int k = sets.size();
-            double[][] mat = new double[k][k];
+            final double[][] mat = new double[k][k];
 
             for (int i = 0; i < k; ++i) {
                 for (int j = i; j < k; ++j) {
-                    mat[i][j] = (double) interCommunityEdgeCount(sets, i, j)/original_graph.E();
+                    mat[i][j] = interCommunityEdgeCount(sets, i, j)/(double) original_graph.E();
                     mat[j][i] = mat[i][j];
                 }
             }
@@ -46,7 +53,7 @@ public class GirvanNewman {
             double[] a = new double[k];
             for (int i = 0; i < k; ++i) {
                 for (int j = 0; j < k; ++j) {
-                    a[i] += mat[i][j];
+                    a[i] += mat[i][j];      // a[i]
                 }
             }
 
@@ -55,6 +62,7 @@ public class GirvanNewman {
                 m += (mat[i][i] - a[i]*a[i]);
             }
 
+//            printModularity(mat);
             return m;
         }
 
@@ -71,7 +79,10 @@ public class GirvanNewman {
             for (Integer v : ci) {
                 for (Edge e : original_graph.getGraph().get(v)) {
                     int w = e.other(v);
-                    if (cj.contains(w)) count++;
+                    if (cj.contains(w)) {
+                        count++;
+//                        System.out.println(e);
+                    }
                 }
             }
             return count;
@@ -107,20 +118,84 @@ public class GirvanNewman {
     public GirvanNewman(Graph g) {
 
         original_graph = new Graph(g);      // copy the input graph
-//        current_graph = new Graph(g);
         partitions = new ArrayList<>();
+        cluster(10);
 
+    }
+
+    public void cluster(int max_count) {
         // original uncutted graph: lastsplit = -1
         List<Set<Integer>> sets = original_graph.getConnectedVertex();
         Group group = new Group(sets);
         partitions.add(group);
-        split(sets.get(0));
+        maxModularity = group.modularity;
 
+        int count = 0;
+        boolean singleVertex = false;
+        while (count < max_count) {
 
-        /////
+            System.out.println("pass :" + count++);
+
+            List<Set<Integer>> temp = new LinkedList<>();
+            for (Set<Integer> set : sets) {
+                temp.add(set);
+            }
+
+            Group max_group = null;
+            List<Set<Integer>> setsNextIter = new LinkedList<>();
+            for (Set<Integer> set : sets) {
+
+                if (set.size() == 1) {
+                    singleVertex = true;
+                    break;
+                }
+
+                temp.remove(set);
+                List<Set<Integer>> split = split(set);
+                for (Set<Integer> s : split) {
+                    temp.add(s);
+                }
+
+                group = new Group(temp);
+
+                if (max_group == null) {
+                    max_group = group;
+                    for (Set<Integer> s : temp) {
+                        setsNextIter.add(s);
+                    }
+                }
+                else if (group.compareTo(max_group) > 0) {
+                    max_group = group;
+                    setsNextIter = new LinkedList<>();
+                    for (Set<Integer> s : temp) {
+                        setsNextIter.add(s);
+                    }
+                }
+
+                for (Set<Integer> s : split) {
+                    temp.remove(s);
+                }
+                temp.add(set);
+            }
+
+            System.out.println("current pass max modularity = " + max_group.modularity);
+
+            if (max_group.modularity < maxModularity || singleVertex) {
+                break;
+            } else {
+                partitions.add(max_group);
+            }
+
+            System.out.println("setsNextIter: " + setsNextIter);
+            sets = setsNextIter;
+        }
     }
 
-    private void split(Set<Integer> set) {  // split a connected graph
+    public void cluster() {
+        cluster(original_graph.V());
+    }
+
+    private List<Set<Integer>> split(Set<Integer> set) {  // split a connected graph
 
         Graph g = original_graph.createSubgraph(set);
         List<Set<Integer>> sets = new LinkedList<>();
@@ -136,8 +211,7 @@ public class GirvanNewman {
             sets = g.getConnectedVertex();
         }
 
-        Group group = new Group(sets);
-        partitions.add(group);
+        return sets;
     }
 
     private Edge findCutEdge(Graph g) {
@@ -168,15 +242,11 @@ public class GirvanNewman {
     }
 
 
-
-    public Graph getOriginalGraph() {return original_graph;}
-
     public static void main(String[] args) {
         Graph g = GraphLoader.loadUndirGraph(args[0]);
 //        Graph g = GMLFileLoader.loadUndirGraph(args[0]);
         GirvanNewman gn = new GirvanNewman(g);
-
-        System.out.println(gn.partitions);
+//        System.out.println(gn.partitions);
 
     }
 }

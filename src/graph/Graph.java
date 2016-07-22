@@ -142,6 +142,11 @@ public class Graph {
     }
 
     public void removeEdge(Edge e) {
+
+        if (e == null) {
+            throw new NullPointerException("edge is null");
+        }
+
         int v = e.either();
         int w = e.other(v);
         removeEdge(v, w);
