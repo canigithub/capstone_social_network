@@ -20,6 +20,12 @@ import java.util.*;
  * also, could terminate if a single node is splited.
  *
  * anyway, the second to the last partition is the best one.
+ *
+ * ok result on football.gml with 8.
+ *
+ * Improvment idea: could penalize a cut if one of it's split has size
+ * less than a threshold.
+ *
  */
 public class GirvanNewman {
 
@@ -119,7 +125,7 @@ public class GirvanNewman {
 
         original_graph = new Graph(g);      // copy the input graph
         partitions = new ArrayList<>();
-        cluster(10);
+        cluster(8);
 
     }
 
@@ -131,7 +137,7 @@ public class GirvanNewman {
         maxModularity = group.modularity;
 
         int count = 0;
-        boolean singleVertex = false;
+//        boolean singleVertex = false;
         while (count < max_count) {
 
             System.out.println("pass :" + count++);
@@ -146,13 +152,14 @@ public class GirvanNewman {
             for (Set<Integer> set : sets) {
 
                 if (set.size() == 1) {
-                    singleVertex = true;
-                    break;
+//                    singleVertex = true;
+//                    break;
+                    continue;
                 }
 
                 temp.remove(set);
-                List<Set<Integer>> split = split(set);
-                for (Set<Integer> s : split) {
+                List<Set<Integer>> splitted = split(set);
+                for (Set<Integer> s : splitted) {
                     temp.add(s);
                 }
 
@@ -161,7 +168,7 @@ public class GirvanNewman {
                 if (max_group == null) {
                     max_group = group;
                     for (Set<Integer> s : temp) {
-                        setsNextIter.add(s);
+                        setsNextIter.add(s);    // must copy by element since temp will be restored.
                     }
                 }
                 else if (group.compareTo(max_group) > 0) {
@@ -172,7 +179,7 @@ public class GirvanNewman {
                     }
                 }
 
-                for (Set<Integer> s : split) {
+                for (Set<Integer> s : splitted) {
                     temp.remove(s);
                 }
                 temp.add(set);
@@ -180,7 +187,9 @@ public class GirvanNewman {
 
             System.out.println("current pass max modularity = " + max_group.modularity);
 
-            if (max_group.modularity < maxModularity || singleVertex) {
+//            if (singleVertex) break;
+
+            if (max_group.modularity < maxModularity) {
                 break;
             } else {
                 partitions.add(max_group);
@@ -241,12 +250,22 @@ public class GirvanNewman {
         return maxedge;
     }
 
+    public List<Set<Integer>> getBestCluster() {
+        if (partitions.size() == 1) {
+            System.out.println("no good partition is found.");
+            return null;
+        }
+        return partitions.get(partitions.size()-2).group;
+    }
+
+    public Graph getOriginalGraph() {return original_graph;}
 
     public static void main(String[] args) {
-        Graph g = GraphLoader.loadUndirGraph(args[0]);
-//        Graph g = GMLFileLoader.loadUndirGraph(args[0]);
+//        Graph g = GraphLoader.loadUndirGraph(args[0]);
+        Graph g = GMLFileLoader.loadUndirGraph(args[0]);
         GirvanNewman gn = new GirvanNewman(g);
 //        System.out.println(gn.partitions);
+        Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
 
     }
 }

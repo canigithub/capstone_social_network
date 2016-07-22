@@ -45,7 +45,7 @@ public class Draw {
         return gs;
     }
 
-    public static void drawGroupedSingleGraph(Graph g, List<Graph> group, String name) {
+    public static void drawGroupedSingleGraph(Graph g, List<Set<Integer>> group, String name) {
 
         org.graphstream.graph.Graph gs = drawSingleGraph(g, name);
 
@@ -54,17 +54,28 @@ public class Draw {
         gs.addAttribute("ui.antialias", true);
 
         int k = 0;
-        for (Graph i : group) {
-            for (Integer v : i.getGraph().keySet()) {
-                Node node;
+        for (Set<Integer> i : group) {
+            for (Integer v : i) {
+                Node node = gs.getNode(Integer.toString(v));
                 switch (k) {
                     case 0:
-                        node = gs.getNode(Integer.toString(v));
-                        node.addAttribute("ui.color", Color.RED);
-                        break;
+                        node.addAttribute("ui.color", Color.RED); break;
                     case 1:
-                        node = gs.getNode(Integer.toString(v));
-                        node.addAttribute("ui.color", Color.BLACK);
+                        node.addAttribute("ui.color", Color.BLUE); break;
+                    case 2:
+                        node.addAttribute("ui.color", Color.GREEN); break;
+                    case 3:
+                        node.addAttribute("ui.color", Color.ORANGE); break;
+                    case 4:
+                        node.addAttribute("ui.color", Color.MAGENTA); break;
+                    case 5:
+                        node.addAttribute("ui.color", Color.CYAN); break;
+                    case 6:
+                        node.addAttribute("ui.color", Color.GRAY); break;
+                    case 7:
+                        node.addAttribute("ui.color", Color.PINK); break;
+                    case 8:
+                        node.addAttribute("ui.color", Color.BLACK); break;
                     default:
                 }
             }
