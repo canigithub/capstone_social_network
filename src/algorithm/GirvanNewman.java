@@ -6,6 +6,7 @@ import graph.Edge;
 import graph.Graph;
 import util.GMLFileLoader;
 import util.GraphLoader;
+import util.NoValidEdgeException;
 
 import java.util.*;
 
@@ -73,7 +74,15 @@ public class GirvanNewman {
                 }
 
                 temp.remove(set);
-                List<Set<Integer>> splitted = split(set);
+                List<Set<Integer>> splitted = null;
+
+                try {
+                    splitted = split(set);
+                }
+                catch (NoValidEdgeException e) {
+                    continue;
+                }
+
                 for (Set<Integer> s : splitted) {
                     temp.add(s);
                 }
@@ -130,7 +139,7 @@ public class GirvanNewman {
         }
     }
 
-    private List<Set<Integer>> split(Set<Integer> set) {  // split a connected graph
+    private List<Set<Integer>> split(Set<Integer> set) throws NoValidEdgeException{  // split a connected graph
 
         Graph g = original_graph.createSubgraph(set);
         List<Set<Integer>> sets = new LinkedList<>();
@@ -140,9 +149,52 @@ public class GirvanNewman {
             throw new IllegalArgumentException("must feed a connected graph.");
         }
 
+
         while (sets.size() == 1) {          // as long as the graph is still connected, keep cutting
             Edge cutedge = findCutEdge(g);
+
+            int v = cutedge.either();
+            int w = cutedge.other(v);
+
+
+//            Stack<Integer> p = new Stack<>();
+//            Stack<Integer> q = new Stack<>();
+//            while (original_graph.getGraph().get(v).size() == 1 || original_graph.getGraph().get(w).size() == 1) {
+//
+//                if (original_graph.getGraph().get(v).size() == 1) {
+//                    p.push(v);
+//                    q.push(w);
+//                }
+//                else if (original_graph.getGraph().get(w).size() == 1) {
+//                    p.push(w);
+//                    q.push(v);
+//                } else {
+//                    throw new IllegalArgumentException("something wrong dangling node");
+//                }
+//                g.removeVertex(p.peek());
+//
+//                cutedge = findCutEdge(g);
+//
+//                if (cutedge == null) {
+//                    throw new NoValidEdgeException("no valid edge remains");
+//                }
+//                v = cutedge.either();
+//                w = cutedge.other(v);
+//            }
+
             g.removeEdge(cutedge);
+
+//            while (!p.isEmpty()) {
+//                v = p.pop();
+//                w = q.pop();
+//                g.addVertex(v);
+//                g.addEdge(v, w);
+//            }
+//
+//            if (!q.isEmpty()) {
+//                throw new IllegalArgumentException("something wrong stack q");
+//            }
+
             sets = g.getConnectedVertex();
         }
 

@@ -128,7 +128,7 @@ public class Graph {
         E++;
     }
 
-    public void removeVertex(int v) {
+    public void removeVertex(int v) {       // remove vertex and all its edges
         validateVertex(v);
         Set<Integer> adjvertex = new HashSet<>();
         for (Edge e : G.get(v)) {
