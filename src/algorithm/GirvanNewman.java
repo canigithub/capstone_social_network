@@ -10,29 +10,23 @@ import util.NoValidEdgeException;
 import java.util.*;
 
 /**
- * Girvan-Newman algorighm
- * use priority queue to manage partitions from different splits.
- * notice: passing graph as parameters using vertex set and global
- * variable original_graph since can't make too many copys of graph
- * (edges use a lot of memory)
+ * Notice: passing graph as parameters better using vertex set and global variable original_graph
+ * since you can't make too many copys of graph (edges spend a lot of memory)
  *
- * could find two local peaks before terminating splitting.
- * also, could terminate if a single node is splited.
- * also, could use a pq to manage connected component, then you can
- * extract the largest k components
+ * Terminating condition: found two local peaks or exceed the max # of passes. default # of
+ * passes is (# of total vertex)/5
  *
- * Improvment idea: could penalize a cut if one of it's split has size
- * less than a threshold.
- * also, need to consider case of dangling node.
- * A Feasible idea: adaptivly decrease min-set-size.
+ * Improvments to the original algorithm:
+ * 1. prevent the one vertex cluster splitting using pq; (better results if graph is sparse)
  *
- * Dangling node cases and single vertex cluster dealed. Should analysis
- * the difference with and without it. --> update: there's no sufficient
+ * Improvment ideas:
+ * 1. penalize a cut if its splitted has size less than a threshold or their sizes differ a lot.
+ * 2. could implement an adaptive function to limit the min size of a cut's result.
+ * 3. set threshold on diameter
  *
- *
- * !!The modularity for karate club data on bisection is not solved yet!!
- *
- *
+ * Remaining problems:
+ * 1. the modularity value for karate club data of one cut is different from the paper, even
+ *    though the partion is identical to the paper's.
  *
  */
 public class GirvanNewman {
@@ -43,7 +37,7 @@ public class GirvanNewman {
     private double maxModularity;
 
     public GirvanNewman(Graph g) {
-        this(g, g.V()/3);
+        this(g, g.V()/10);
     }
 
     public GirvanNewman(Graph g, int max_pass) {
@@ -191,14 +185,18 @@ public class GirvanNewman {
             e.setFlow(edgeflow.get(e));             // set the edge flow to total flow.
         }
 
-
 //        for (Edge e : edgeflow.keySet()) {
-//            if (e.compareTo(maxedge) < 0) {
+//            if (e.compareTo(maxedge) < 0) {       // remember comparison is reversed for edge
 //                maxedge = e;
 //            }
 //        }
 
-
+        // Before using pq to prevent single vertex cluster, I also tried to temporarily remove the edge
+        // to the dangling node and restore it back later to prevent the edge from been cut
+        // But it has a few problems:
+        // 1. if vertex is removed, the graph structure is changed and may lead to inaccurate result.
+        // 2. sometimes, removed vertex will lead to an unconnected graph (lesmis.gml), which leads
+        //    to incorrect results eventually.
         Queue<Edge> pq = new PriorityQueue<>();
         for (Edge e : edgeflow.keySet()) {
             pq.add(e);
@@ -329,10 +327,22 @@ public class GirvanNewman {
     public static void main(String[] args) {
 //        Graph g = GraphLoader.loadUndirGraph(args[0]);
         Graph g = GMLFileLoader.loadUndirGraph(args[0]);
+//        Draw.drawSingleGraph(g, "funny");
 
-        Draw.drawSingleGraph(g, "funny");
+        List<Graph> list = g.getConnectedComponent();
+        int  v = -1;
+        Graph g0 = null;
+        for (Graph gg : list) {
+            if (gg.V() > v) {
+                g0 = gg;
+                v = gg.V();
+            }
+        }
 
-//        GirvanNewman gn = new GirvanNewman(g);
+        System.out.println("# of vertex =" + v);
+        Draw.drawSingleGraph(g0, "funny");
+
+//        GirvanNewman gn = new GirvanNewman(g0);
 //        if (gn.getBestCluster() != null) {
 //            System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
 //            Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");

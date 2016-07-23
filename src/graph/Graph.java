@@ -170,14 +170,6 @@ public class Graph {
         removeEdge(v, w);
     }
 
-    public void removeVertexWithNoEdge() {
-        for (int v = 0; v < 1000; ++v) {
-            if (G.get(v) == null || G.get(v).size() == 0) {
-                removeVertex(v);
-            }
-        }
-    }
-
     public List<Set<Integer>> getConnectedVertex() {
 
         List<Set<Integer>> ret = new LinkedList<>();

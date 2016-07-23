@@ -1,6 +1,5 @@
 package draw;
 
-import algorithm.GirvanNewman;
 import graph.Edge;
 import graph.Graph;
 import org.graphstream.graph.Node;
@@ -8,7 +7,6 @@ import org.graphstream.graph.implementations.SingleGraph;
 import util.GraphLoader;
 
 import java.awt.Color;
-import java.sql.Time;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -173,9 +171,9 @@ public class Draw {
             k++;
         }
 
-        for (Node n : gs) {
-            n.addAttribute("ui.label", n.getId());
-        }
+//        for (Node n : gs) {
+//            n.addAttribute("ui.label", n.getId());
+//        }
 
         gs.display();
     }
