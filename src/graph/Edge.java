@@ -4,7 +4,7 @@ package graph;
  * Undirected edge for social network clustering.
  *
  */
-public class Edge {     // betweenness of an edge: total amount of flow it carries
+public class Edge implements Comparable<Edge> {     // betweenness of an edge: total amount of flow it carries
 
     private final int v;
     private final int w;
@@ -54,5 +54,12 @@ public class Edge {     // betweenness of an edge: total amount of flow it carri
         StringBuilder sb = new StringBuilder();
         sb.append(v + "-" + w);
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(Edge other) {  // gonna need max-pq and default is min-pq
+        int reversed = 1;
+        if (other == null) return -1*reversed;
+        return -1*reversed*Double.compare(flow, other.flow);
     }
 }

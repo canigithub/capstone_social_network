@@ -59,7 +59,8 @@ public class Draw {
             }
         }
 
-        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: orange; " +
+        // good color: rgb(255,68,68),
+        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: rgb(255,68,68); " +
                 "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
         gs.addAttribute("ui.antialias", true);
 
@@ -94,7 +95,7 @@ public class Draw {
 
 
 //        gs.addAttribute("ui.stylesheet", "graph {fill-color: pink; fill-mode: dyn-plain}");
-        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: orange; " +
+        gs.addAttribute("ui.stylesheet", "node {shape: box; fill-color: black; " +
                 "text-mode:normal; text-background-mode: plain; fill-mode: dyn-plain;}");
         gs.addAttribute("ui.antialias");
 
@@ -116,15 +117,15 @@ public class Draw {
                     case 2:
                         node.addAttribute("ui.color", Color.GREEN); break;
                     case 3:
-                        node.addAttribute("ui.color", Color.ORANGE); break;
-                    case 4:
                         node.addAttribute("ui.color", Color.MAGENTA); break;
-                    case 5:
-                        node.addAttribute("ui.color", Color.CYAN); break;
-                    case 6:
-                        node.addAttribute("ui.color", Color.YELLOW); break;
-                    case 7:
+                    case 4:
                         node.addAttribute("ui.color", Color.PINK); break;
+                    case 5:
+                        node.addAttribute("ui.color", Color.YELLOW); break;
+                    case 6:
+                        node.addAttribute("ui.color", Color.CYAN); break;
+                    case 7:
+                        node.addAttribute("ui.color", Color.ORANGE); break;
                     case 8:
                         node.addAttribute("ui.color", DARK_PURPLE); break;
                     case 9:
@@ -161,11 +162,19 @@ public class Draw {
                         node.addAttribute("ui.color", DARK_CYAN); break;
                     case 25:
                         node.addAttribute("ui.color", LIGHT_CYAN); break;
-                    default:
+                    case 26:
+                        node.addAttribute("ui.color", Color.YELLOW); break;
+                    case 27:
                         node.addAttribute("ui.color", Color.GRAY); break;
+                    default:
+                        node.addAttribute("ui.color", Color.WHITE); break;
                 }
             }
             k++;
+        }
+
+        for (Node n : gs) {
+            n.addAttribute("ui.label", n.getId());
         }
 
         gs.display();

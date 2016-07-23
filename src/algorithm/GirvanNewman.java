@@ -1,6 +1,5 @@
 package algorithm;
 
-import com.sun.org.apache.regexp.internal.RE;
 import draw.Draw;
 import graph.Edge;
 import graph.Graph;
@@ -132,6 +131,11 @@ public class GirvanNewman {
                 if (localpeakcnt == 2) break;
             } else {
                 maxModularity = max_group.modularity;
+                int c = 0;
+                for (Set<Integer> s : max_group.group) {
+                    c += s.size();
+                }
+//                System.out.println("cluster total size = " + c);
                 partitions.add(max_group);
                 decrease = false;
             }
@@ -155,53 +159,11 @@ public class GirvanNewman {
 
         while (sets.size() == 1) {          // as long as the graph is still connected, keep cutting
             Edge cutedge = findCutEdge(g);
-
-            int v = cutedge.either();
-            int w = cutedge.other(v);
-
-            // This section deals with [Single Vertex Cluster] problem.
-            // for a vertex that is not dangling vertex, it's unreasonable for this
-            // vertex itself to be a cluster.
-            // here, temporarily remove this node and edge until find a new edge to cut.
-            // after a proper edge is found, restore the temporarily removed nodes and edges.
-            Stack<Integer> x = new Stack<>();
-            Stack<Integer> y = new Stack<>();
-            while (g.getGraph().get(v).size() == 1 || g.getGraph().get(w).size() == 1) {
-
-                if (g.getGraph().get(v).size() == 1) {
-                    x.push(v);
-                    y.push(w);
-                }
-                else if (g.getGraph().get(w).size() == 1) {
-                    x.push(w);
-                    y.push(v);
-                } else {
-                    throw new IllegalArgumentException("something wrong dangling node");
-                }
-                g.removeVertex(x.peek());
-
-                cutedge = findCutEdge(g);
-
-                if (cutedge == null) {
-                    throw new NoValidEdgeException("no valid edge remains");
-                }
-                v = cutedge.either();
-                w = cutedge.other(v);
+            if (cutedge == null) {
+                throw new NoValidEdgeException("no valid edge to cut");
             }
 
             g.removeEdge(cutedge);
-
-            // This section deals with [Single Vertex Cluster] problem. (continue)
-            // restore the temorarily removed nodes and edges
-            while (!x.isEmpty()) {
-                v = x.pop();
-                w = y.pop();
-                g.addVertex(v);
-                g.addEdge(v, w);
-            }
-            if (!y.isEmpty()) {
-                throw new IllegalArgumentException("something wrong stack y");
-            }
 
             sets = g.getConnectedVertex();
         }
@@ -209,7 +171,7 @@ public class GirvanNewman {
         return sets;
     }
 
-    private Edge findCutEdge(Graph g) {
+    private Edge findCutEdge(Graph g) {     // find an edge to cut with exceptions use pq
 
         Map<Edge, Double> edgeflow = new HashMap<>();
 
@@ -224,15 +186,35 @@ public class GirvanNewman {
             }
         }
 
-        double maxflow = -1;
         Edge maxedge = null;
-
         for (Edge e : edgeflow.keySet()) {
-            if (edgeflow.get(e) > maxflow) {
-                maxflow = edgeflow.get(e);
-                maxedge = e;
-            }
+            e.setFlow(edgeflow.get(e));             // set the edge flow to total flow.
         }
+
+
+//        for (Edge e : edgeflow.keySet()) {
+//            if (e.compareTo(maxedge) < 0) {
+//                maxedge = e;
+//            }
+//        }
+
+
+        Queue<Edge> pq = new PriorityQueue<>();
+        for (Edge e : edgeflow.keySet()) {
+            pq.add(e);
+        }
+
+        maxedge = pq.remove();
+
+        int v = maxedge.either();
+        int w = maxedge.other(v);
+        while (!pq.isEmpty() && (g.getGraph().get(v).size() == 1 || g.getGraph().get(w).size() == 1)) {
+            maxedge = pq.remove();              // if after cut this edge, a single node cluster appear
+            v = maxedge.either();               // then find the next max edge.
+            w = maxedge.other(v);
+        }
+
+        if (pq.isEmpty()) return null;
 
         return maxedge;
     }
@@ -347,20 +329,20 @@ public class GirvanNewman {
     public static void main(String[] args) {
 //        Graph g = GraphLoader.loadUndirGraph(args[0]);
         Graph g = GMLFileLoader.loadUndirGraph(args[0]);
-//        g.removeVertexWithNoEdge(); // just for better visualization
-//        Draw.drawSingleGraph(g, "funny");
-        GirvanNewman gn = new GirvanNewman(g);
-//        System.out.println(gn.partitions.size());
-        if (gn.getBestCluster() != null) {
-            System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
-//        System.out.println(gn.partitions);
-            Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
-        }
 
-//        for (int i = 1; i <= 5; ++i) {
-//            GirvanNewman gn = new GirvanNewman(g, i);
+        Draw.drawSingleGraph(g, "funny");
+
+//        GirvanNewman gn = new GirvanNewman(g);
+//        if (gn.getBestCluster() != null) {
 //            System.out.println(NEWLINE + "splits of best cluster: " + gn.getBestCluster().size());
 //            Draw.drawGroupedSingleGraph(gn.getOriginalGraph(), gn.getBestCluster(), "funny");
+//            int c = 0;
+//            for (Set<Integer> s : gn.getBestCluster()) {
+//                c += s.size();
+//            }
+//            System.out.println(g.V() + ", " + c);
+//        } else {
+//            Draw.drawSingleGraph(g, "funny");
 //        }
 
     }
